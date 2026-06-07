@@ -9,7 +9,7 @@ const Projects: React.FC = () => {
   const { language, t } = useLanguage();
   const { data: dbProjects, loading } = useSupabaseData<Project>('projects');
   const [filter, setFilter] = useState('All');
-  
+  /* No es necesario
   const getFallback = (key: string) => {
     const fallbacks: Record<string, Record<string, string>> = {
       projects_subtitle: { es: 'Mi portafolio', en: 'My portfolio', et: 'Minu portfell' },
@@ -17,7 +17,7 @@ const Projects: React.FC = () => {
     };
     return fallbacks[key]?.[language as string] || fallbacks[key]?.['es'] || key;
   };
-
+*/
   const projectsToDisplay = dbProjects.length > 0 ? dbProjects : [
     {
       id: 'bodega-app',
@@ -50,16 +50,16 @@ const Projects: React.FC = () => {
   ] as Project[];
 
   const categories = ['All', ...Array.from(new Set(projectsToDisplay.map(p => p.category)))];
-  
-  const filteredProjects = filter === 'All' 
-    ? projectsToDisplay 
+
+  const filteredProjects = filter === 'All'
+    ? projectsToDisplay
     : projectsToDisplay.filter(p => p.category === filter);
 
   return (
     <section id="projects" className="projects-section">
       <div className="container">
         <div className="section-header">
-          <motion.span 
+          <motion.span
             className="section-subtitle"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -67,7 +67,7 @@ const Projects: React.FC = () => {
           >
             {t('projects_subtitle') || 'Mi portafolio'}
           </motion.span>
-          <motion.h2 
+          <motion.h2
             className="section-title"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -102,7 +102,7 @@ const Projects: React.FC = () => {
           <div className="projects-grid">
             <AnimatePresence mode='wait'>
               {filteredProjects.map((project, idx) => (
-                <motion.div 
+                <motion.div
                   key={project.id}
                   className="project-card glass"
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -120,7 +120,7 @@ const Projects: React.FC = () => {
                       <img src={project.image_url} alt={project[`title_${language}` as keyof Project] as string} className="project-img" loading="lazy" />
                     ) : (
                       <div className="placeholder-img">
-                         <Code size={64} />
+                        <Code size={64} />
                       </div>
                     )}
                   </div>
