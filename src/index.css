@@ -1,0 +1,161 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  /* New Digimax Theme Palette (Dark Mode Default) */
+  --text: #a1a1aa;
+  --text-h: #ffffff;
+  --bg: #0b0c10;
+  --bg-card: rgba(30, 30, 40, 0.6);
+  --bg-card-hover: rgba(40, 40, 55, 0.8);
+  --border: rgba(255, 255, 255, 0.05);
+  --code-bg: #1f2028;
+  
+  /* Brand colors */
+  --primary: #a855f7;
+  --primary-hover: #c084fc;
+  --accent: #ec4899;
+  --accent-bg: rgba(168, 85, 247, 0.15);
+  --accent-border: rgba(168, 85, 247, 0.5);
+  
+  --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  --shadow-primary: 0 10px 25px -5px rgba(168, 85, 247, 0.4);
+
+  --sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --heading: 'Outfit', system-ui, -apple-system, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+}
+
+body.light-mode {
+  --text: #374151; /* gray-700 */
+  --text-h: #111827; /* gray-900 */
+  --bg: #f3f4f6; /* gray-100 */
+  --bg-card: rgba(255, 255, 255, 0.7);
+  --bg-card-hover: rgba(255, 255, 255, 0.9);
+  --border: rgba(0, 0, 0, 0.08);
+  --code-bg: #e5e7eb;
+  
+  --primary: #7c3aed; /* violet-600 */
+  --primary-hover: #6d28d9;
+  --accent: #db2777; /* pink-600 */
+  
+  --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(219, 39, 119, 0.06) 0%, transparent 50%);
+}
+
+/* Force dark mode behavior always since the theme is natively dark */
+body {
+  margin: 0;
+  font: 16px/1.6 var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
+  background-attachment: fixed;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--heading);
+  font-weight: 700;
+  color: var(--text-h);
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 4rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  @media (max-width: 1024px) { font-size: 3rem; }
+  @media (max-width: 768px) { font-size: 2.5rem; }
+}
+
+h2 {
+  font-size: 2.5rem;
+  letter-spacing: -0.01em;
+  @media (max-width: 1024px) { font-size: 2rem; }
+}
+
+p {
+  margin: 0 0 1rem 0;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Generic Button Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.8rem;
+  border-radius: 3rem;
+  font-family: var(--heading);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  outline: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  color: white !important;
+  box-shadow: var(--shadow-primary);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px -5px rgba(168, 85, 247, 0.6);
+  color: white !important;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-h);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  border-radius: 1.5rem;
+}
+
+section {
+  padding: 6rem 0;
+  position: relative;
+}

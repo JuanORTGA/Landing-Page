@@ -1,0 +1,15 @@
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
+/* Ensure images and SVGs behave nicely */
+img, svg {
+  max-width: 100%;
+  height: auto;
+}
