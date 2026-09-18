@@ -1,8 +1,10 @@
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { motion } from 'framer-motion';
-import { Target, Globe, Plane, CheckCircle2, Sparkles } from 'lucide-react';
-import tallinnImage from '../assets/ImageEstonia.jpeg';
+import { GlobalFluencyIcon } from './icons/FlaticonVectors';
+import { SpanishFlag, UkFlag, EstonianFlag } from './icons/LanguageFlags';
+
+import juanImg from '../assets/juan.jpg';
 
 const About: React.FC = () => {
   const { language, t } = useLanguage();
@@ -14,329 +16,564 @@ const About: React.FC = () => {
 
   const getFallback = (key: string) => {
     const fallbacks: Record<string, Record<string, string>> = {
-      about_subtitle: { es: 'Conoce un poco más', en: 'Get to know more', et: 'Saa rohkem teada' },
-      about_title: { es: 'Sobre Mí', en: 'About Me', et: 'Minust' },
-      about_badge_1: { es: 'Inglés: B1/B2 – Competencia profesional', en: 'English: B1/B2 – Professional proficiency', et: 'Inglise keel: B1/B2 – Professionaalne pädevus' },
-      about_badge_2: { es: 'Estatus: Remoto / Abierto a reubicación Estonia', en: 'Status: Remote / Open to Estonia relocation', et: 'Staatus: Kaugtöö / Avatud Eesti ümberasumisele' },
-      about_badge_3: { es: 'Meta: Trabajar en Estonia, alto rendimiento', en: 'Goal: To work in Estonia, high performance', et: 'Eesmärk: Töötada Eestis, kõrge jõudlus' },
-      about_text_1: { 
-        es: 'Ingeniero en Informática (próximo a graduarse) con experiencia comprobada en desarrollo Full-Stack.', 
-        en: 'Computer Engineer (soon to graduate) with proven experience in Full-Stack development.', 
-        et: 'Informaatikainsener (peagi lõpetamas), kellel on tõestatud kogemus Full-Stack arenduses.' 
+      about_kicker: {
+        es: 'Sobre mí',
+        en: 'About me',
+        et: 'Minust'
       },
-      about_text_2: { 
-        es: 'Optimización de consultas SQL y reducción de tiempos de carga en un 20%.', 
-        en: 'SQL query optimization and 20% reduction in load times.', 
-        et: 'SQL päringute optimeerimine ja laadimisaegade vähendamine 20%.' 
+      about_title: {
+        es: 'Construyo herramientas digitales que resuelven problemas reales.',
+        en: 'I build digital tools that solve real problems.',
+        et: 'Ehitan digitaalseid tööriistu, mis lahendavad tõelisi probleeme.'
       },
-      about_text_3: { 
-        es: 'Apasionado por la seguridad, cifrado de datos y código limpio.', 
-        en: 'Passionate about security, data encryption, and clean code.', 
-        et: 'Kirglik turvalisuse, andmete krüpteerimise ja puhta koodi vastu.' 
+      about_p1: {
+        es: 'Mi enfoque combina desarrollo frontend y backend con altos estándares: interfaces rápidas, APIs estructuradas y bases de datos eficientes y seguras.',
+        en: 'My approach combines frontend and backend development with high standards: fast interfaces, structured APIs, and efficient, secure databases.',
+        et: 'Minu lähenemine ühendab frontend- ja backend-arenduse kõrgete standarditega: kiired liidesed, struktureeritud API-d ning tõhusad ja turvalised andmebaasid.'
       },
-      about_text_4: { 
-        es: 'Uso de asistentes de IA para acelerar el desarrollo manteniendo la calidad.', 
-        en: 'Use of AI assistants to accelerate development while maintaining quality.', 
-        et: 'AI assistentide kasutamine arenduse kiirendamiseks, säilitades kvaliteedi.' 
+      about_p2: {
+        es: 'Valoro el trabajo en equipo, la comunicación clara y el aprendizaje continuo en cada producto y reto técnico que emprendo.',
+        en: 'I value teamwork, clear communication, and continuous learning across every product and technical challenge I undertake.',
+        et: 'Väärtustan meeskonnatööd, selget suhtlust ja pidevat õppimist igas tootes ja tehnilises väljakutses.'
+      },
+      stat1_num: { es: '+3', en: '+3', et: '+3' },
+      stat1_lbl: { es: 'AÑOS DE EXPERIENCIA', en: 'YEARS EXPERIENCE', et: 'AASTAT KOGEMUST' },
+      stat2_num: { es: '10+', en: '10+', et: '10+' },
+      stat2_lbl: { es: 'PROYECTOS COMPLETADOS', en: 'COMPLETED PROJECTS', et: 'VALMINUD PROJEKTI' },
+      stat3_num: { es: '100%', en: '100%', et: '100%' },
+      stat3_lbl: { es: 'COMPROMISO TÉCNICO', en: 'TECH COMMITMENT', et: 'TEHNILINE PÜHENDUMUS' },
+      lang_section_title: {
+        es: 'IDIOMAS & COMUNICACIÓN PROFESIONAL',
+        en: 'LANGUAGE PROFICIENCY & COMMUNICATION',
+        et: 'KEELEOSKUS JA SUHTLUS'
+      },
+      lang_es_name: { es: 'Español', en: 'Spanish', et: 'Hispaania keel' },
+      lang_es_level: { es: 'Nativo', en: 'Native', et: 'Emakeel' },
+      lang_es_desc: {
+        es: 'Lengua materna. Comunicación fluida, clara y estructurada en entornos de ingeniería.',
+        en: 'Native fluency for clear communication, technical documentation, and collaborative team environments.',
+        et: 'Emakeel sujuvaks suhtluseks, tehniliseks dokumentatsiooniks ja koostööks.'
+      },
+      lang_en_name: { es: 'Inglés', en: 'English', et: 'Inglise keel' },
+      lang_en_level: { es: 'B1 / B2 · Profesional', en: 'B1 / B2 · Professional', et: 'B1 / B2 · Professionaalne' },
+      lang_en_desc: {
+        es: 'Competencia profesional en lectura de documentación técnica, desarrollo de software y participación en reuniones de equipo.',
+        en: 'Professional competence for reading architectural documentation, writing clean code, and participating in daily syncs.',
+        et: 'Ametialane pädevus tehnilise dokumentatsiooni lugemiseks, koodi kirjutamiseks ja igapäevaseks tiimitööks.'
+      },
+      lang_et_name: { es: 'Estonio', en: 'Estonian', et: 'Eesti keel' },
+      lang_et_level: { es: 'A1 / A2 · En progreso activo', en: 'A1 / A2 · Active Learning', et: 'A1 / A2 · Aktiivne õpe' },
+      lang_et_desc: {
+        es: 'Estudio y práctica activa enfocada en la integración cultural y vida profesional en el ecosistema estonio.',
+        en: 'Ongoing study of vocabulary, grammar, and daily communication focused on living and working in Estonia.',
+        et: 'Pidev keeleõpe ja praktika suunatud elamiseks ja töötamiseks Eesti digitaalses ökosüsteemis.'
       },
     };
     return fallbacks[key]?.[language as string] || fallbacks[key]?.['es'] || key;
   };
 
-  const badges = [
-    { icon: Globe, label: getT('about_badge_1', getFallback('about_badge_1')) },
-    { icon: Plane, label: getT('about_badge_2', getFallback('about_badge_2')) },
-    { icon: Target, label: getT('about_badge_3', getFallback('about_badge_3')) }
+  const stats = [
+    { num: getT('stat1_num', getFallback('stat1_num')), label: getT('stat1_lbl', getFallback('stat1_lbl')) },
+    { num: getT('stat2_num', getFallback('stat2_num')), label: getT('stat2_lbl', getFallback('stat2_lbl')) },
+    { num: getT('stat3_num', getFallback('stat3_num')), label: getT('stat3_lbl', getFallback('stat3_lbl')) },
   ];
 
-  return (
-    <section id="about" className="about-section">
-      <div className="container">
-        <div className="section-header">
-          <motion.span 
-            className="section-subtitle"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            {getT('about_subtitle', getFallback('about_subtitle'))}
-          </motion.span>
-          <motion.h2 
-            className="section-title"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ delay: 0.1 }}
-          >
-            {getT('about_title', getFallback('about_title'))}
-          </motion.h2>
-        </div>
+  // Foto de perfil del desarrollador (dinámica desde Supabase o asset local)
+  const customProfile = t('image_about_profile');
+  const profileImageUrl = customProfile && customProfile !== 'image_about_profile' ? customProfile : juanImg;
 
-        <div className="about-grid">
-          <motion.div 
+  return (
+    <section id="about" className="about-root">
+      <div className="container">
+        <div className="about-layout">
+          {/* Left Column: Developer Photo Card with 01- Corner Badge */}
+          <motion.div
             className="about-image-wrapper"
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
           >
-            <div className="about-visual glass" style={{ backgroundImage: `url(${tallinnImage})` }}>
-              <div className="visual-overlay"></div>
-              <div className="visual-circle circle-1"></div>
-              <div className="visual-circle circle-2"></div>
-              <div className="visual-content">
-                <Target size={48} className="visual-icon" />
-                <h3>{badges[2].label}</h3>
-                <div className="estonia-info">
-                   <Sparkles size={16} />
-                   <span>Capital Digital de Europa</span>
-                </div>
-                <div className="estonia-tags">
-                  e-Residency · Talento Global
-                </div>
+            <div className="about-photo-card">
+              <img
+                src={profileImageUrl}
+                alt="Juan Ortega - Desarrollador de Software"
+                className="about-dev-img"
+              />
+
+              {/* Corner Badge 01— on the bottom right */}
+              <div className="about-corner-badge">
+                <span>01—</span>
               </div>
             </div>
           </motion.div>
 
-          <div className="about-content">
-            <motion.div 
-              className="about-text glass"
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-            >
-              <ul className="text-list">
-                <li><CheckCircle2 size={20} className="check-icon" /> {getT('about_text_1', getFallback('about_text_1'))}</li>
-                <li><CheckCircle2 size={20} className="check-icon" /> {getT('about_text_2', getFallback('about_text_2'))}</li>
-                <li><CheckCircle2 size={20} className="check-icon" /> {getT('about_text_3', getFallback('about_text_3'))}</li>
-                <li><CheckCircle2 size={20} className="check-icon" /> {getT('about_text_4', getFallback('about_text_4'))}</li>
-              </ul>
-            </motion.div>
+          {/* Right Column: Profile Narrative, Languages & 3 Stat Cards */}
+          <motion.div
+            className="about-content"
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            <div className="section-kicker">
+              <span>{getT('about_kicker', getFallback('about_kicker'))}</span>
+              <span className="kicker-dot"></span>
+            </div>
 
-            <div className="about-badges">
-              {badges.slice(0, 2).map((badge, index) => (
-                <motion.div 
-                  key={index}
-                  className="badge-card glass"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.2 }}
-                >
-                  <div className="badge-icon">
-                    <badge.icon size={24} />
+            <h2 className="about-heading">
+              {getT('about_title', getFallback('about_title'))}
+            </h2>
+
+            <p className="about-paragraph">
+              {getT('about_p1', getFallback('about_p1'))}
+            </p>
+
+            <p className="about-paragraph secondary">
+              {getT('about_p2', getFallback('about_p2'))}
+            </p>
+
+            {/* Competencia Lingüística & Comunicación Profesional */}
+            <div className="about-languages-block">
+              <h4 className="languages-block-title">
+                <GlobalFluencyIcon size={17} color="#0072ce" className="lang-globe-icon" />
+                {getT('lang_section_title', getFallback('lang_section_title'))}
+              </h4>
+
+              <div className="languages-linear-list">
+                <div className="lang-linear-item">
+                  <span className="lang-flag-bullet" title="Español (ES)">
+                    <SpanishFlag width={26} height={18} />
+                  </span>
+                  <div className="lang-info-col">
+                    <div className="lang-heading-row">
+                      <span className="lang-name-label">{getT('lang_es_name', getFallback('lang_es_name'))}</span>
+                      <span className="lang-level-badge">{getT('lang_es_level', getFallback('lang_es_level'))}</span>
+                    </div>
+                    <p className="lang-detail-text">
+                      {getT('lang_es_desc', getFallback('lang_es_desc'))}
+                    </p>
                   </div>
-                  <span>{badge.label}</span>
-                </motion.div>
+                </div>
+
+                <div className="lang-linear-item">
+                  <span className="lang-flag-bullet" title="English (GB / UK)">
+                    <UkFlag width={26} height={18} />
+                  </span>
+                  <div className="lang-info-col">
+                    <div className="lang-heading-row">
+                      <span className="lang-name-label">{getT('lang_en_name', getFallback('lang_en_name'))}</span>
+                      <span className="lang-level-badge">{getT('lang_en_level', getFallback('lang_en_level'))}</span>
+                    </div>
+                    <p className="lang-detail-text">
+                      {getT('lang_en_desc', getFallback('lang_en_desc'))}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="lang-linear-item">
+                  <span className="lang-flag-bullet" title="Eesti keel (EE)">
+                    <EstonianFlag width={26} height={18} />
+                  </span>
+                  <div className="lang-info-col">
+                    <div className="lang-heading-row">
+                      <span className="lang-name-label">{getT('lang_et_name', getFallback('lang_et_name'))}</span>
+                      <span className="lang-level-badge">{getT('lang_et_level', getFallback('lang_et_level'))}</span>
+                    </div>
+                    <p className="lang-detail-text">
+                      {getT('lang_et_desc', getFallback('lang_et_desc'))}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 3 Metric Cards */}
+            <div className="about-stats-grid">
+              {stats.map((stat, idx) => (
+                <div key={idx} className="about-stat-card">
+                  <span className="stat-number">{stat.num}</span>
+                  <span className="stat-label">{stat.label}</span>
+                </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
       <style>{`
-        .section-header {
-          text-align: center;
-          margin-bottom: 4rem;
-        }
-        .section-subtitle {
-          display: inline-block;
-          color: var(--primary);
-          font-family: var(--heading);
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 2px;
-          margin-bottom: 0.5rem;
-          background: rgba(168, 85, 247, 0.1);
-          padding: 0.4rem 1rem;
-          border-radius: 2rem;
-        }
-        .section-title {
-          font-size: 3rem;
+        .about-root {
+          background: var(--bg);
+          padding-top: 5rem;
+          padding-bottom: 6.5rem;
+          border-top: 1px solid var(--border);
+          border-bottom: 1px solid var(--border);
           position: relative;
+          transition: background-color 0.3s ease, border-color 0.3s ease;
         }
-        .about-grid {
+
+        body.dark-mode .about-root {
+          background: #0c1014;
+          border-top: 1px solid rgba(0, 114, 206, 0.18);
+          border-bottom: 1px solid rgba(0, 114, 206, 0.18);
+        }
+
+        .about-layout {
           display: grid;
-          grid-template-columns: 0.8fr 1.2fr;
+          grid-template-columns: 380px 1fr;
           gap: 4rem;
           align-items: center;
         }
-        .about-image-wrapper {
-          position: relative;
-          height: 100%;
-          min-height: 450px;
-        }
-        .about-visual {
-          position: absolute;
-          inset: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-          background-size: cover;
-          background-position: center;
-          border: 1px solid var(--border);
-          border-radius: 2rem;
-          box-shadow: var(--shadow);
-        }
-        .visual-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%);
-          z-index: 1;
-        }
-        .about-visual::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
+
+        /* Photo Card */
+        .about-photo-card {
           width: 100%;
-          height: 10px;
-          background: linear-gradient(90deg, #0072CE 33%, #000000 33%, #000000 66%, #FFFFFF 66%);
-          box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-          z-index: 3;
-        }
-        .visual-circle {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(80px);
-          z-index: 2;
-          opacity: 0.3;
-        }
-        .circle-1 {
-          width: 300px;
-          height: 300px;
-          background: var(--primary);
-          top: -15%;
-          left: -15%;
-        }
-        .circle-2 {
-          width: 350px;
-          height: 350px;
-          background: #0072CE;
-          bottom: -20%;
-          right: -10%;
-        }
-        .visual-content {
+          height: 440px;
+          border-radius: 2rem;
+          overflow: hidden;
           position: relative;
-          z-index: 3;
-          text-align: center;
-          padding: 2rem 1.2rem;
           background: var(--bg-card);
-          backdrop-filter: blur(6px);
           border: 1px solid var(--border);
-          border-radius: 1.5rem;
-          max-width: 90%;
-          box-shadow: var(--shadow);
-        }
-        .visual-icon {
-          color: var(--primary);
-          margin-bottom: 1rem;
-          filter: drop-shadow(0 0 10px var(--primary));
-        }
-        .visual-content h3 {
-          font-size: 1.4rem;
-          line-height: 1.4;
-          margin-bottom: 1rem;
-          color: var(--text-h);
-          font-family: var(--heading);
-        }
-        .estonia-info {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          color: #0072CE;
-          font-weight: 700;
-          font-size: 0.9rem;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          margin-bottom: 0.5rem;
-        }
-        .estonia-tags {
-          font-size: 0.85rem;
-          color: var(--text);
-          opacity: 0.7;
-          font-family: var(--mono);
-          letter-spacing: 0.5px;
-        }
-        
-        .about-content {
-          display: flex;
-          flex-direction: column;
-          gap: 2rem;
-        }
-        .about-text {
-          padding: 2.5rem;
-          border-left: 4px solid var(--primary);
-        }
-        .text-list {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-          display: flex;
-          flex-direction: column;
-          gap: 1.5rem;
-        }
-        .text-list li {
-          display: flex;
-          gap: 1rem;
-          font-size: 1.1rem;
-          line-height: 1.6;
-          color: var(--text);
-        }
-        .check-icon {
-          color: var(--primary);
-          flex-shrink: 0;
-          margin-top: 2px;
-        }
-        .about-badges {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 1.5rem;
-        }
-        .badge-card {
-          padding: 1.5rem;
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 1rem;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
           transition: all 0.3s ease;
-          background: rgba(255, 255, 255, 0.03);
-        }
-        .badge-card:hover {
-          transform: translateY(-5px);
-          border-color: var(--primary);
-          background: rgba(168, 85, 247, 0.05);
-        }
-        .badge-icon {
-          width: 50px;
-          height: 50px;
-          background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-          color: white;
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .badge-card span {
-          font-family: var(--heading);
-          font-weight: 600;
-          font-size: 1.1rem;
-          line-height: 1.4;
         }
 
-        @media (max-width: 992px) {
-          .about-grid {
+        body.dark-mode .about-photo-card {
+          background: #121820;
+          border: 1px solid rgba(0, 114, 206, 0.25);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.65);
+        }
+
+        .about-dev-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center top;
+          display: block;
+          filter: contrast(102%) saturate(105%);
+          transition: transform 0.4s ease;
+        }
+
+        .about-photo-card:hover .about-dev-img {
+          transform: scale(1.03);
+        }
+
+        .about-corner-badge {
+          position: absolute;
+          bottom: 1.15rem;
+          right: 1.15rem;
+          background: rgba(255, 255, 255, 0.88);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          padding: 0.3rem 0.7rem;
+          border-radius: 999px;
+          font-family: var(--font-heading);
+          font-size: 0.78rem;
+          font-weight: 600;
+          letter-spacing: 0.02em;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+          transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+        }
+
+        .about-corner-badge span {
+          color: #0f172a;
+        }
+
+        body.dark-mode .about-corner-badge {
+          background: rgba(15, 23, 42, 0.8);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+        }
+
+        body.dark-mode .about-corner-badge span {
+          color: #f8fafc;
+        }
+
+        /* Right Content */
+        .about-heading {
+          font-family: var(--font-heading);
+          font-size: 2.15rem;
+          line-height: 1.22;
+          color: var(--text-h);
+          margin-bottom: 1.25rem;
+          letter-spacing: -0.025em;
+          font-weight: 800;
+        }
+
+        .about-paragraph {
+          font-size: 0.98rem;
+          line-height: 1.68;
+          color: var(--text);
+          margin-bottom: 1.15rem;
+        }
+
+        .about-paragraph.secondary {
+          margin-bottom: 1.5rem;
+          color: var(--text-muted);
+        }
+
+        /* Sellos de Calidad Técnica */
+        .about-pillars-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.6rem;
+          margin-bottom: 2.25rem;
+        }
+
+        .pillar-seal {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35rem;
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: #0072ce;
+          background: rgba(0, 114, 206, 0.08);
+          border: 1px solid rgba(0, 114, 206, 0.25);
+          padding: 0.3rem 0.75rem;
+          border-radius: 2rem;
+          transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        body.dark-mode .pillar-seal {
+          color: #38bdf8;
+          background: rgba(0, 114, 206, 0.12);
+          border-color: rgba(0, 114, 206, 0.3);
+        }
+
+        .pillar-seal:hover {
+          background: rgba(0, 114, 206, 0.14);
+          border-color: rgba(0, 114, 206, 0.35);
+          color: #0072ce;
+          transform: translateY(-1px);
+        }
+
+        body.dark-mode .pillar-seal:hover {
+          background: rgba(0, 114, 206, 0.22);
+          border-color: rgba(56, 189, 248, 0.45);
+          color: #38bdf8;
+        }
+
+        /* Stats Grid */
+        .about-stats-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.15rem;
+        }
+
+        .about-stat-card {
+          background: #ffffff;
+          border: 1px solid rgba(0, 114, 206, 0.14);
+          border-radius: 1.25rem;
+          padding: 1.35rem 1.25rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.35rem;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+          transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease, border-color 0.25s ease, background-color 0.25s ease;
+        }
+
+        body.dark-mode .about-stat-card {
+          background: #121820;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+        }
+
+        .about-stat-card:hover {
+          border-color: rgba(0, 114, 206, 0.28);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+        }
+
+        body.dark-mode .about-stat-card:hover {
+          background: #16202c;
+          border-color: rgba(255, 255, 255, 0.16);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+        }
+
+        .stat-number {
+          font-family: var(--font-heading);
+          font-size: 1.95rem;
+          font-weight: 800;
+          color: #0072ce;
+          line-height: 1;
+        }
+
+        body.dark-mode .stat-number {
+          color: #ffffff;
+        }
+
+        .stat-label {
+          font-family: var(--font-mono);
+          font-size: 0.68rem;
+          font-weight: 700;
+          color: var(--text-muted);
+          letter-spacing: 0.08em;
+        }
+
+        /* Competencia Lingüística & Comunicación Profesional */
+        .about-languages-block {
+          margin-bottom: 2.25rem;
+          padding-top: 1.5rem;
+          border-top: 1px solid var(--border);
+        }
+
+        .languages-block-title {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-family: var(--font-heading);
+          font-size: 0.92rem;
+          font-weight: 700;
+          color: #0072ce;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          margin-bottom: 1.25rem;
+        }
+
+        body.dark-mode .languages-block-title {
+          color: #38bdf8;
+        }
+
+        .lang-globe-icon {
+          color: #0072ce;
+        }
+
+        body.dark-mode .lang-globe-icon {
+          color: #38bdf8;
+        }
+
+        .languages-linear-list {
+          display: flex;
+          flex-direction: column;
+          gap: 1.15rem;
+        }
+
+        .lang-linear-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 0.85rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .lang-linear-item:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+
+        .lang-flag-bullet {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          margin-top: 0.15rem;
+          flex-shrink: 0;
+          border-radius: 4px;
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.08);
+          transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+        }
+
+        .lang-linear-item:hover .lang-flag-bullet {
+          transform: translateY(-1px) scale(1.06);
+          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 114, 206, 0.2);
+        }
+
+        body.dark-mode .lang-flag-bullet {
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.15);
+        }
+
+        body.dark-mode .lang-linear-item:hover .lang-flag-bullet {
+          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(56, 189, 248, 0.4);
+        }
+
+        .lang-info-col {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+          flex: 1;
+        }
+
+        .lang-heading-row {
+          display: flex;
+          align-items: center;
+          gap: 0.65rem;
+          flex-wrap: wrap;
+        }
+
+        .lang-name-label {
+          font-family: var(--font-heading);
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: var(--text-h);
+        }
+
+        .lang-level-badge {
+          font-family: var(--font-sans);
+          font-size: 0.88rem;
+          font-weight: 500;
+          color: var(--text-muted);
+          display: flex;
+          align-items: center;
+        }
+        
+        .lang-level-badge::before {
+          content: '—';
+          margin-right: 0.4rem;
+          color: var(--text-muted);
+        }
+
+        .lang-detail-text {
+          font-size: 0.86rem;
+          line-height: 1.5;
+          color: var(--text-muted);
+          margin: 0;
+        }
+
+        @media (max-width: 960px) {
+          .about-layout {
             grid-template-columns: 1fr;
-            gap: 3rem;
+            gap: 2.5rem;
           }
-          .about-image-wrapper {
-            min-height: 350px;
+          .about-photo-card {
+            max-width: 340px;
+            height: 320px;
+            margin: 0 auto;
+            border-radius: 1.5rem;
           }
         }
-        @media (max-width: 768px) {
-          .about-badges {
-            grid-template-columns: 1fr;
+
+        @media (max-width: 640px) {
+          .about-heading {
+            font-size: clamp(1.65rem, 5.5vw, 2.15rem);
+            margin-bottom: 0.95rem;
+          }
+          .about-paragraph {
+            font-size: 0.92rem;
+            line-height: 1.6;
+          }
+          .lang-linear-item {
+            gap: 0.65rem;
+          }
+          .lang-detail-text {
+            font-size: 0.82rem;
+          }
+          .about-stats-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+          }
+          .about-stat-card {
+            padding: 0.9rem 0.4rem;
+            border-radius: 0.95rem;
+            text-align: center;
+            align-items: center;
+          }
+          .stat-number {
+            font-size: 1.5rem;
+          }
+          .stat-label {
+            font-size: 0.58rem;
+            letter-spacing: 0.04em;
           }
         }
       `}</style>

@@ -1,323 +1,725 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage, type Language } from '../context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Globe, Moon, Sun } from 'lucide-react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
+import joeLogo from '../assets/joe-technology-logo-transparent.png';
 
 const Navbar: React.FC = () => {
   const { language, setLanguage } = useLanguage();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
-    const savedTheme = localStorage.getItem('theme');
-    return savedTheme !== 'light';
+    return localStorage.getItem('theme') === 'dark';
   });
 
   useEffect(() => {
-    if (!isDarkMode) {
-      document.body.classList.add('light-mode');
+    if (isDarkMode) {
+      document.body.classList.add('dark-mode');
     } else {
-      document.body.classList.remove('light-mode');
+      document.body.classList.remove('dark-mode');
     }
 
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      // Activa el marco al comenzar a bajar la página
+      setIsScrolled(window.scrollY > 30);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isDarkMode]);
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    if (isDarkMode) {
-      document.body.classList.add('light-mode');
-      localStorage.setItem('theme', 'light');
+    const next = !isDarkMode;
+    setIsDarkMode(next);
+    localStorage.setItem('theme', next ? 'dark' : 'light');
+    if (next) {
+      document.body.classList.add('dark-mode');
     } else {
-      document.body.classList.remove('light-mode');
-      localStorage.setItem('theme', 'dark');
+      document.body.classList.remove('dark-mode');
     }
   };
 
   const navLinks = [
-    { id: 'about', es: 'Sobre Mí', en: 'About', et: 'Minust' },
-    { id: 'skills', es: 'Habilidades', en: 'Skills', et: 'Oskused' },
+    { id: 'about', es: 'Sobre mí', en: 'About me', et: 'Minust' },
     { id: 'experience', es: 'Experiencia', en: 'Experience', et: 'Kogemus' },
     { id: 'projects', es: 'Proyectos', en: 'Projects', et: 'Projektid' },
     { id: 'contact', es: 'Contacto', en: 'Contact', et: 'Kontakt' },
   ];
 
-  const languages: { code: Language; label: string; flag: string }[] = [
-    { code: 'es', label: 'ES', flag: 'ES' },
-    { code: 'en', label: 'EN', flag: 'EN' },
-    { code: 'et', label: 'ET', flag: 'ET' },
+  const languages: { code: Language; label: string }[] = [
+    { code: 'es', label: 'ES' },
+    { code: 'en', label: 'EN' },
+    { code: 'et', label: 'ET' },
   ];
 
   return (
-    <nav className={`navbar ${isScrolled ? 'scrolled glass' : ''}`}>
-      <div className="container nav-content">
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="logo"
-        >
-          <span>JD</span>Ortega.
-        </motion.div>
+    <nav className={`navbar-root ${isScrolled ? 'is-scrolled' : ''}`}>
+      <div className="container nav-container">
+        {/* Left: Brand Logo */}
+        <a href="#hero" className="nav-logo" title="JoE TECHNOLOGY · Juan Ortega">
+          <img 
+            src={joeLogo} 
+            alt="JoE TECHNOLOGY" 
+            className="nav-brand-logo-img" 
+          />
+          <span className="logo-text">
+            JUAN ORTEGA <span className="logo-divider">/</span> {language === 'es' ? 'PORTAFOLIO' : language === 'et' ? 'PORTFOOLIO' : 'PORTFOLIO'}
+          </span>
+        </a>
 
-        {/* Desktop Menu */}
-        <ul className="nav-links desktop-only">
+        {/* Center: Navigation Links */}
+        <ul className="nav-menu desktop-only">
           {navLinks.map((link) => (
             <li key={link.id}>
-              <a href={`#${link.id}`}>{link[language]}</a>
+              <a href={`#${link.id}`} className="nav-link">
+                {link[language] || link.es}
+              </a>
             </li>
           ))}
         </ul>
 
+        {/* Right: Actions */}
         <div className="nav-actions">
-          
-          <button 
-            className="theme-toggle" 
+          {/* Dark / Light Theme Toggle Button con Animación Cósmica de Rodamiento */}
+          <motion.button 
+            className={`theme-toggle-btn ${isDarkMode ? 'is-dark' : 'is-light'}`}
             onClick={toggleTheme}
-            title={isDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+            aria-label={isDarkMode ? 'Cambiar a modo claro (Amanecer)' : 'Cambiar a modo oscuro (Anochecer)'}
+            title={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+            whileTap={{ scale: 0.88 }}
+            whileHover={{ scale: 1.08 }}
+            transition={{ type: "spring", stiffness: 400, damping: 20 }}
           >
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
+            {/* Resplandor ambiental de fondo */}
+            <div className="celestial-glow-backdrop" />
 
-          <div className="lang-selector">
-            <Globe size={18} className="lang-icon" />
-            <div className="lang-btns-wrapper">
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  className={`lang-btn ${language === lang.code ? 'active' : ''}`}
-                  onClick={() => setLanguage(lang.code)}
-                  title={lang.label}
+            <AnimatePresence mode="wait" initial={false}>
+              {isDarkMode ? (
+                <motion.div
+                  key="moon-body"
+                  className="celestial-orbit-stage moon-stage"
+                  initial={{ x: -28, y: 7, rotate: -260, scale: 0.25, opacity: 0 }}
+                  animate={{ 
+                    x: 0, 
+                    y: 0, 
+                    rotate: 0, 
+                    scale: 1, 
+                    opacity: 1,
+                    transition: {
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 19,
+                      mass: 0.75
+                    }
+                  }}
+                  exit={{ 
+                    x: 28, 
+                    y: 7, 
+                    rotate: 260, 
+                    scale: 0.25, 
+                    opacity: 0,
+                    transition: { duration: 0.28, ease: [0.4, 0, 0.2, 1] }
+                  }}
                 >
-                  {lang.flag}
-                </button>
-              ))}
-            </div>
+                  <Moon size={18} className="celestial-svg moon-svg" />
+
+                  {/* Micro-estrellas centelleantes que acompañan a la luna */}
+                  <motion.span 
+                    className="celestial-twinkle star-top"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ 
+                      scale: [0, 1.2, 1], 
+                      opacity: [0, 1, 0.85] 
+                    }}
+                    transition={{ delay: 0.18, duration: 0.35 }}
+                  >
+                    ✦
+                  </motion.span>
+                  <motion.span 
+                    className="celestial-twinkle star-bottom"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ 
+                      scale: [0, 1.3, 1], 
+                      opacity: [0, 1, 0.7] 
+                    }}
+                    transition={{ delay: 0.24, duration: 0.35 }}
+                  >
+                    •
+                  </motion.span>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="sun-body"
+                  className="celestial-orbit-stage sun-stage"
+                  initial={{ x: -28, y: 7, rotate: -260, scale: 0.25, opacity: 0 }}
+                  animate={{ 
+                    x: 0, 
+                    y: 0, 
+                    rotate: 0, 
+                    scale: 1, 
+                    opacity: 1,
+                    transition: {
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 19,
+                      mass: 0.75
+                    }
+                  }}
+                  exit={{ 
+                    x: 28, 
+                    y: 7, 
+                    rotate: 260, 
+                    scale: 0.25, 
+                    opacity: 0,
+                    transition: { duration: 0.28, ease: [0.4, 0, 0.2, 1] }
+                  }}
+                >
+                  <Sun size={19} className="celestial-svg sun-svg" />
+                  
+                  {/* Aura solar radiante con destello al entrar */}
+                  <motion.div 
+                    className="sun-corona-flare"
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ 
+                      scale: [0.5, 1.35, 1], 
+                      opacity: [0, 0.7, 0] 
+                    }}
+                    transition={{ duration: 0.45 }}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.button>
+
+          {/* Language Selector Pill */}
+          <div className="lang-pill-group">
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                className={`lang-btn ${language === lang.code ? 'active' : ''}`}
+                onClick={() => setLanguage(lang.code)}
+                aria-label={`Cambiar a ${lang.label}`}
+              >
+                {lang.label}
+              </button>
+            ))}
           </div>
 
+          {/* CTA Button */}
+          <a href="#contact" className="btn-pill-navy nav-cta-btn desktop-only">
+            {language === 'en' ? "Let's talk" : language === 'et' ? 'Räägime' : 'Hablemos'}
+          </a>
+
+          {/* Mobile Hamburger (Only on mobile devices < 768px) */}
           <button 
-            className="mobile-menu-toggle mobile-only"
+            className="mobile-toggle-btn mobile-only"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Abrir menú móvil"
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mobile-menu glass mobile-only"
+          <motion.div 
+            className="mobile-drawer mobile-only"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
           >
-            <ul>
+            <div className="mobile-drawer-content">
               {navLinks.map((link) => (
-                <li key={link.id}>
-                  <a 
-                    href={`#${link.id}`} 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {link[language]}
-                  </a>
-                </li>
+                <a
+                  key={link.id}
+                  href={`#${link.id}`}
+                  className="mobile-link"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link[language] || link.es}
+                </a>
               ))}
-            </ul>
+              <a
+                href="#contact"
+                className="btn-pill-navy mobile-cta"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {language === 'en' ? "Let's talk" : language === 'et' ? 'Räägime' : 'Hablemos'}
+              </a>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       <style>{`
-        .navbar {
+        /* =========================================================
+           1. ESTADO INICIAL (Arriba, sobre las fotos del Hero):
+              100% Transparente y libre de marco
+           ========================================================= */
+        .navbar-root {
           position: fixed;
           top: 0;
           left: 0;
           width: 100%;
           z-index: 1000;
-          padding: 1.5rem 0;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          border-bottom: 1px solid transparent;
+          padding: 1.35rem 0;
+          background: transparent;
+          border: none;
+          box-shadow: none;
+          backdrop-filter: none;
+          -webkit-backdrop-filter: none;
+          transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .navbar.scrolled {
-          padding: 1rem 0;
-          background: rgba(11, 12, 16, 0.8);
-          border-bottom: 1px solid var(--border);
-          border-radius: 0;
+
+        /* =========================================================
+           2. ESTADO AL HACER SCROLL (Pasando las fotos):
+              Aparece el marco de cristal esmerilado sticky
+           ========================================================= */
+        .navbar-root.is-scrolled {
+          padding: 0.85rem 0;
+          background: rgba(255, 255, 255, 0.96) !important;
+          backdrop-filter: blur(16px) !important;
+          -webkit-backdrop-filter: blur(16px) !important;
+          border-bottom: 1px solid rgba(0, 114, 206, 0.15) !important;
+          box-shadow: 0 8px 30px -4px rgba(0, 114, 206, 0.08) !important;
         }
-        body.light-mode .navbar.scrolled {
-          background: rgba(255, 255, 255, 0.85);
+
+        body.dark-mode .navbar-root.is-scrolled {
+          background: rgba(12, 16, 20, 0.95) !important;
+          border-bottom: 1px solid rgba(0, 114, 206, 0.25) !important;
+          box-shadow: 0 8px 30px -4px rgba(0, 0, 0, 0.75) !important;
         }
-        .nav-content {
+
+        .nav-container {
           display: flex;
-          justify-content: space-between;
           align-items: center;
+          justify-content: space-between;
         }
-        .logo {
-          font-family: var(--heading);
-          font-size: 1.8rem;
+
+        /* Logo */
+        .nav-logo {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          font-family: var(--font-heading);
           font-weight: 800;
-          color: var(--text-h);
-          letter-spacing: -0.05em;
+          font-size: 0.98rem;
+          color: #ffffff;
+          letter-spacing: -0.01em;
+          text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+          transition: transform 0.2s ease, color 0.3s ease;
         }
-        .logo span {
-          background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+
+        .nav-logo:hover {
+          transform: translateY(-1px);
         }
-        .nav-links {
+
+        .nav-brand-logo-img {
+          height: 34px;
+          width: auto;
+          object-fit: contain;
+          display: block;
+          transition: transform 0.25s ease;
+          filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+        }
+
+        .nav-logo:hover .nav-brand-logo-img {
+          transform: scale(1.05);
+        }
+
+        .logo-text {
+          font-weight: 800;
+        }
+
+        .logo-divider {
+          color: rgba(255, 255, 255, 0.6);
+          font-weight: 400;
+          margin: 0 0.2rem;
+          transition: color 0.3s ease;
+        }
+
+        /* Menu Links */
+        .nav-menu {
           display: flex;
           list-style: none;
-          gap: 2.5rem;
+          align-items: center;
+          gap: 2.25rem;
           margin: 0;
           padding: 0;
         }
-        .nav-links a {
-          font-family: var(--heading);
+
+        .nav-link {
+          font-size: 0.94rem;
           font-weight: 600;
-          font-size: 1rem;
-          color: var(--text);
-          position: relative;
+          color: #ffffff;
+          opacity: 0.92;
+          letter-spacing: -0.01em;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+          transition: all 0.25s ease;
         }
-        .nav-links a::after {
-          content: '';
-          position: absolute;
-          width: 0;
-          height: 2px;
-          bottom: -4px;
-          left: 0;
-          background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-          transition: width 0.3s ease;
-          border-radius: 2px;
+
+        .nav-link:hover {
+          opacity: 1;
+          color: #38bdf8;
+          transform: translateY(-1px);
         }
-        .nav-links a:hover {
+
+        body.dark-mode .nav-link:hover {
+          color: #38bdf8;
+        }
+
+        /* =========================================================
+           3. CAMBIOS DE COLOR AUTOMÁTICOS AL ACTIVARSE EL MARCO:
+              Máxima nitidez sobre los fondos blancos/oscuros del sitio
+           ========================================================= */
+        .navbar-root.is-scrolled .nav-logo {
           color: var(--text-h);
+          text-shadow: none;
         }
-        .nav-links a:hover::after {
-          width: 100%;
+
+        .navbar-root.is-scrolled .logo-divider {
+          color: var(--text-muted);
         }
+
+        .navbar-root.is-scrolled .nav-link {
+          color: var(--text);
+          text-shadow: none;
+          opacity: 1;
+        }
+
+        .navbar-root.is-scrolled .nav-link:hover {
+          color: var(--primary-blue);
+        }
+
+        body.dark-mode .navbar-root.is-scrolled .nav-link:hover {
+          color: var(--kicker);
+        }
+
+        /* Right Actions */
         .nav-actions {
           display: flex;
           align-items: center;
-          gap: 1.5rem;
+          gap: 0.85rem;
         }
 
-        /* Theme Toggle Button */
-        .theme-toggle {
-          background: var(--bg-card);
-          border: 1px solid var(--border);
-          color: var(--primary);
-          width: 38px;
-          height: 38px;
+        /* =========================================================
+           THEME TOGGLE BUTTON - RUEDA CÓSMICA & ANIMACIÓN CELESTIAL
+           ========================================================= */
+        .theme-toggle-btn {
+          position: relative;
+          width: 40px;
+          height: 40px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-        .theme-toggle:hover {
-          transform: scale(1.1);
-          background: var(--accent-bg);
-          color: var(--primary-hover);
-        }
-
-        /* Language Selector Enhancement */
-        .lang-icon {
-          color: var(--primary);
-        }
-        .lang-selector {
-          display: flex;
-          align-items: center;
-          gap: 0.8rem;
-          background: var(--bg-card);
-          padding: 0.3rem 0.5rem 0.3rem 0.8rem;
-          border-radius: 3rem;
           border: 1px solid var(--border);
-          box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .lang-btns-wrapper {
-          display: flex;
-          gap: 0.3rem;
-        }
-        .lang-btn {
-          background: transparent;
-          font-family: var(--heading);
-          font-weight: 700;
-          font-size: 0.85rem;
-          color: var(--text);
-          padding: 0.3rem 0.6rem;
-          border: none;
-          cursor: pointer;
-          border-radius: 2rem;
-          transition: all 0.3s ease;
-        }
-        .lang-btn:hover {
+          background: var(--bg-card);
           color: var(--text-h);
-          background: rgba(255,255,255,0.05);
-        }
-        body.light-mode .lang-btn:hover {
-          background: rgba(0,0,0,0.05);
-        }
-        .lang-btn.active {
-          background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-          color: white;
-          box-shadow: 0 4px 10px rgba(168, 85, 247, 0.3);
+          cursor: pointer;
+          overflow: hidden;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+          transition: border-color 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+          padding: 0;
+          outline: none;
+          -webkit-tap-highlight-color: transparent;
         }
 
-        .mobile-only {
-          display: none;
+        .theme-toggle-btn.is-light {
+          background: rgba(255, 255, 255, 0.96);
+          border-color: rgba(245, 158, 11, 0.28);
+          box-shadow: 0 4px 14px rgba(245, 158, 11, 0.14), 0 0 0 1px rgba(245, 158, 11, 0.08);
         }
-        .mobile-menu-toggle {
-          background: transparent;
-          border: none;
-          color: var(--text-h);
-          cursor: pointer;
+
+        .theme-toggle-btn.is-light:hover {
+          border-color: #f59e0b;
+          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.32), 0 0 14px rgba(245, 158, 11, 0.25);
+        }
+
+        .theme-toggle-btn.is-dark {
+          background: rgba(15, 23, 42, 0.95);
+          border-color: rgba(56, 189, 248, 0.35);
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55), 0 0 12px rgba(56, 189, 248, 0.18);
+        }
+
+        .theme-toggle-btn.is-dark:hover {
+          border-color: #38bdf8;
+          box-shadow: 0 6px 22px rgba(0, 0, 0, 0.65), 0 0 18px rgba(56, 189, 248, 0.45);
+        }
+
+        .celestial-glow-backdrop {
+          position: absolute;
+          inset: -30%;
+          border-radius: 50%;
+          pointer-events: none;
+          opacity: 0.18;
+          transition: opacity 0.3s ease;
+        }
+
+        .theme-toggle-btn.is-light .celestial-glow-backdrop {
+          background: radial-gradient(circle, rgba(245, 158, 11, 0.5) 0%, transparent 70%);
+        }
+
+        .theme-toggle-btn.is-dark .celestial-glow-backdrop {
+          background: radial-gradient(circle, rgba(56, 189, 248, 0.45) 0%, transparent 70%);
+        }
+
+        /* Celestial Orbit Stage */
+        .celestial-orbit-stage {
+          position: relative;
+          width: 100%;
+          height: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
+          transform-origin: center center;
+          user-select: none;
         }
-        .mobile-menu {
+
+        /* Sun Icon Styling & Hover Reactivity */
+        .sun-svg {
+          color: #f59e0b;
+          filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.65));
+          transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+        }
+
+        .theme-toggle-btn:hover .sun-svg {
+          transform: rotate(35deg) scale(1.12);
+          filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.9));
+        }
+
+        .sun-corona-flare {
+          position: absolute;
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(245, 158, 11, 0.45) 0%, transparent 75%);
+          pointer-events: none;
+        }
+
+        /* Moon Icon Styling & Hover Reactivity */
+        .moon-svg {
+          color: #38bdf8;
+          filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.7));
+          transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+        }
+
+        .theme-toggle-btn:hover .moon-svg {
+          transform: rotate(-20deg) scale(1.1);
+          filter: drop-shadow(0 0 11px rgba(56, 189, 248, 0.95));
+        }
+
+        /* Micro-estrellas centelleantes en modo oscuro */
+        .celestial-twinkle {
+          position: absolute;
+          pointer-events: none;
+          line-height: 1;
+          user-select: none;
+        }
+
+        .star-top {
+          top: 6px;
+          right: 8px;
+          font-size: 8px;
+          color: #e0f2fe;
+          filter: drop-shadow(0 0 3px rgba(224, 242, 254, 0.9));
+          animation: starTwinklePulse 2.2s ease-in-out infinite alternate;
+        }
+
+        .star-bottom {
+          bottom: 8px;
+          left: 8px;
+          font-size: 5px;
+          color: #38bdf8;
+          filter: drop-shadow(0 0 2px rgba(56, 189, 248, 0.8));
+          animation: starTwinklePulse 2.7s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes starTwinklePulse {
+          0% {
+            opacity: 0.45;
+            transform: scale(0.85);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.35);
+          }
+          100% {
+            opacity: 0.55;
+            transform: scale(0.9);
+          }
+        }
+
+        /* Language Pill Group */
+        .lang-pill-group {
+          display: flex;
+          align-items: center;
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: 2rem;
+          padding: 0.2rem 0.3rem;
+          gap: 0.15rem;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .lang-btn {
+          background: transparent;
+          border: none;
+          border-radius: 1.5rem;
+          padding: 0.25rem 0.65rem;
+          font-family: var(--font-heading);
+          font-size: 0.75rem;
+          font-weight: 700;
+          color: var(--text-muted);
+          transition: all 0.2s ease;
+          cursor: pointer;
+        }
+
+        .lang-btn.active {
+          background: #050811;
+          color: #ffffff;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+        }
+
+        body.dark-mode .lang-btn.active {
+          background: #0072ce;
+          color: #ffffff;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+        }
+
+        .nav-cta-btn {
+          font-size: 0.88rem;
+          padding: 0.55rem 1.4rem;
+          background: #050811;
+          color: #ffffff !important;
+          border: 1px solid rgba(0, 0, 0, 0.12);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
+          transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, box-shadow 0.22s ease, border-color 0.2s ease;
+        }
+
+        .nav-cta-btn:hover {
+          background: #005fa8 !important;
+          border-color: rgba(255, 255, 255, 0.25) !important;
+          color: #ffffff !important;
+          transform: translateY(-1.5px);
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        body.dark-mode .nav-cta-btn {
+          background: #0072ce;
+          border-color: rgba(255, 255, 255, 0.18);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .nav-cta-btn:hover {
+          background: #005fa8 !important;
+          border-color: rgba(255, 255, 255, 0.28) !important;
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        /* Responsive rules */
+        .mobile-only {
+          display: none !important;
+        }
+
+        .desktop-only {
+          display: flex !important;
+        }
+
+        .mobile-toggle-btn {
+          background: rgba(255, 255, 255, 0.08);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid var(--border);
+          border-radius: 50%;
+          width: 38px;
+          height: 38px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #ffffff;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .navbar-root.is-scrolled .mobile-toggle-btn {
+          color: var(--text-h);
+          background: var(--bg-card);
+        }
+
+        /* Mobile Drawer */
+        .mobile-drawer {
           position: absolute;
           top: 100%;
-          left: 1rem;
-          right: 1rem;
+          left: 0.75rem;
+          right: 0.75rem;
+          background: rgba(14, 22, 32, 0.96);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 1.5rem;
           padding: 1.5rem;
-          border-radius: 1rem;
-          overflow: hidden;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
           margin-top: 0.5rem;
+          z-index: 1001;
         }
-        .mobile-menu ul {
-          list-style: none;
+
+        .mobile-drawer-content {
           display: flex;
           flex-direction: column;
-          gap: 1.2rem;
-          padding: 0;
-          margin: 0;
+          gap: 1rem;
         }
-        .mobile-menu a {
+
+        .mobile-link {
+          font-family: var(--font-heading);
+          font-size: 1.05rem;
+          font-weight: 700;
+          color: #ffffff;
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          transition: color 0.2s ease;
+        }
+
+        .mobile-link:hover {
+          color: #38bdf8;
+        }
+
+        .mobile-cta {
+          width: 100%;
+          text-align: center;
+          margin-top: 0.5rem;
+          background: #0072ce;
+          color: #ffffff;
+          padding: 0.75rem;
+          border-radius: 2rem;
+          font-weight: 700;
           display: block;
-          font-size: 1.2rem;
-          font-family: var(--heading);
-          font-weight: 600;
-          color: var(--text-h);
         }
 
         @media (max-width: 768px) {
           .desktop-only {
-            display: none;
+            display: none !important;
           }
           .mobile-only {
-            display: block;
+            display: flex !important;
           }
-          .lang-selector {
-            padding: 0.3rem;
+          .nav-logo {
+            font-size: 0.88rem;
           }
-          .lang-icon {
+          .logo-text .logo-divider,
+          .logo-text span:last-child {
             display: none;
+          }
+          .nav-actions {
+            gap: 0.45rem;
+          }
+          .lang-pill-group {
+            padding: 0.15rem;
+          }
+          .lang-btn {
+            padding: 0.25rem 0.45rem;
+            font-size: 0.7rem;
           }
         }
       `}</style>

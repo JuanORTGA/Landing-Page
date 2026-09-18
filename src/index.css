@@ -1,61 +1,101 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
-  /* New Digimax Theme Palette (Dark Mode Default) */
-  --text: #a1a1aa;
-  --text-h: #ffffff;
-  --bg: #0b0c10;
-  --bg-card: rgba(30, 30, 40, 0.6);
-  --bg-card-hover: rgba(40, 40, 55, 0.8);
-  --border: rgba(255, 255, 255, 0.05);
-  --code-bg: #1f2028;
+  /* =========================================================
+     🇪🇪 MODO CLARO: BLANCO NÓRDICO CON AZUL DE ESTONIA (#0072ce)
+     ========================================================= */
+  --bg: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-subtle: #f8fafc;
+  --bg-secondary: #f1f5f9;
   
-  /* Brand colors */
-  --primary: #a855f7;
-  --primary-hover: #c084fc;
-  --accent: #ec4899;
-  --accent-bg: rgba(168, 85, 247, 0.15);
-  --accent-border: rgba(168, 85, 247, 0.5);
+  --text: #1e293b;               /* Párrafos: gris carbón oscuro, alto contraste */
+  --text-muted: #64748b;         /* Texto secundario */
+  --text-h: #030712;             /* Titulares: negro profundo */
   
-  --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-  --shadow-primary: 0 10px 25px -5px rgba(168, 85, 247, 0.4);
+  --primary-blue: #0072ce;       /* Azul oficial bandera de Estonia (Pantone 285 C) */
+  --primary-blue-hover: #005fa8;
+  --accent-navy: #050811;        /* Botones de acción y CTA en Negro ejecutivo para modo claro */
+  --accent-navy-hover: #0072ce;  /* Hover dinámico al Azul de Estonia */
+  --accent-navy-dark: #000000;   
+  
+  --kicker: #0072ce;             /* Color de las etiquetas y kickers en fondo blanco */
+  --kicker-light: #38bdf8;
+  --cyan-accent: #0072ce;        
+  --mint-accent: #e0f2fe;        
+  
+  --border: rgba(0, 114, 206, 0.14);
+  --border-focus: rgba(0, 114, 206, 0.5);
+  --border-light: rgba(0, 114, 206, 0.2);
+  
+  --btn-circle-bg: #ffffff;
+  --btn-circle-text: #0072ce;
+  --btn-circle-border: rgba(0, 114, 206, 0.22);
+  
+  --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.07);
 
-  --sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --heading: 'Outfit', system-ui, -apple-system, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, monospace;
 }
 
-body.light-mode {
-  --text: #374151; /* gray-700 */
-  --text-h: #111827; /* gray-900 */
-  --bg: #f3f4f6; /* gray-100 */
-  --bg-card: rgba(255, 255, 255, 0.7);
-  --bg-card-hover: rgba(255, 255, 255, 0.9);
-  --border: rgba(0, 0, 0, 0.08);
-  --code-bg: #e5e7eb;
+body.dark-mode {
+  /* =========================================================
+     🇪🇪 MODO OSCURO: TONO EXACTO SOLICITADO (#0c1014)
+     ========================================================= */
+  --bg: #0c1014;                 /* Fondo oscuro exacto de la muestra (#0c1014) */
+  --bg-card: #121820;            /* Tarjetas con elevación sutil sobre #0c1014 */
+  --bg-card-subtle: #16202c;     /* Elementos secundarios */
+  --bg-secondary: #0c1014;
   
-  --primary: #7c3aed; /* violet-600 */
-  --primary-hover: #6d28d9;
-  --accent: #db2777; /* pink-600 */
+  --text: #cbd5e1;               /* Párrafos: gris claro nítido */
+  --text-muted: #94a3b8;         /* Texto secundario */
+  --text-h: #ffffff;             /* Titulares: blanco puro brillante */
   
-  --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
-  background-image: 
-    radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 85% 30%, rgba(219, 39, 119, 0.06) 0%, transparent 50%);
+  --primary-blue: #0072ce;       /* Azul oficial bandera de Estonia */
+  --primary-blue-hover: #2897f3;
+  --accent-navy: #0072ce;        /* Botones principales en Azul de Estonia */
+  --accent-navy-hover: #2897f3;
+  --accent-navy-dark: #005fa8;   
+  
+  --kicker: #38bdf8;             /* Azul de Estonia luminoso para contraste en negro */
+  --kicker-light: #7dd3fc;
+  --cyan-accent: #0072ce;        
+  --mint-accent: #0072ce;        
+  
+  --border: rgba(0, 114, 206, 0.22);
+  --border-focus: rgba(0, 114, 206, 0.6);
+  --border-light: rgba(255, 255, 255, 0.12);
+  
+  --btn-circle-bg: #080d1a;
+  --btn-circle-text: #38bdf8;
+  --btn-circle-border: rgba(0, 114, 206, 0.35);
+  
+  --shadow-subtle: 0 2px 10px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 6px 20px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.65);
 }
 
-/* Force dark mode behavior always since the theme is natively dark */
-body {
+* {
+  box-sizing: border-box;
   margin: 0;
-  font: 16px/1.6 var(--sans);
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 15px; /* Escala global refinada y ergonómica para 100% de zoom */
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
   color: var(--text);
   background: var(--bg);
-  background-image: 
-    radial-gradient(circle at 15% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
-  background-attachment: fixed;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -63,99 +103,205 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--heading);
-  font-weight: 700;
+  font-family: var(--font-heading);
   color: var(--text-h);
-  margin-top: 0;
-}
-
-h1 {
-  font-size: 4rem;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  @media (max-width: 1024px) { font-size: 3rem; }
-  @media (max-width: 768px) { font-size: 2.5rem; }
-}
-
-h2 {
-  font-size: 2.5rem;
-  letter-spacing: -0.01em;
-  @media (max-width: 1024px) { font-size: 2rem; }
-}
-
-p {
-  margin: 0 0 1rem 0;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  transition: color 0.3s ease;
 }
 
 a {
-  color: var(--primary);
+  color: inherit;
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
-a:hover {
-  color: var(--primary-hover);
+button {
+  font-family: inherit;
+  cursor: pointer;
 }
 
 .container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
 }
 
-/* Generic Button Styles */
-.btn {
+@media (max-width: 640px) {
+  .container {
+    padding: 0 1.15rem;
+  }
+}
+
+/* ─── Section Label: Etiqueta editorial limpia unificada ─── */
+.section-kicker {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.8rem 1.8rem;
-  border-radius: 3rem;
-  font-family: var(--heading);
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: none;
-  outline: none;
+  font-family: var(--font-heading);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--kicker) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.85rem;
+  transition: color 0.3s ease;
+  opacity: 1;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-  color: white !important;
-  box-shadow: var(--shadow-primary);
+.section-kicker.on-dark {
+  color: #38bdf8 !important;
+  opacity: 1;
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 15px 35px -5px rgba(168, 85, 247, 0.6);
-  color: white !important;
+.kicker-dot {
+  display: none;
 }
 
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
+/* ─── Section Title Principal ─── */
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 2.15rem;
+  line-height: 1.18;
   color: var(--text-h);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  font-weight: 800;
+  margin-bottom: 0.85rem;
+  letter-spacing: -0.025em;
+  transition: color 0.3s ease;
 }
 
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 1.85rem;
+  }
 }
 
-/* Glassmorphism utility */
-.glass {
-  background: var(--bg-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
-  border-radius: 1.5rem;
-}
-
+/* Section Padding Ergonómico */
 section {
-  padding: 6rem 0;
+  padding: 4rem 0;
   position: relative;
+}
+
+@media (max-width: 768px) {
+  section {
+    padding: 3rem 0;
+  }
+}
+
+/* Button & Action Utilities */
+.btn-pill-navy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  background: var(--accent-navy);
+  color: #ffffff !important;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0.55rem 1.35rem;
+  border-radius: 2rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-pill-navy:hover {
+  background: var(--accent-navy-hover);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.btn-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease, color 0.22s ease;
+  border: 1px solid var(--btn-circle-border);
+  background: var(--btn-circle-bg);
+  color: var(--btn-circle-text);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.btn-circle:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 114, 206, 0.3);
+  color: var(--kicker);
+}
+
+.btn-circle-navy {
+  background: var(--accent-navy);
+  color: #ffffff !important;
+  border: 1px solid var(--border-light);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.btn-circle-navy:hover {
+  background: var(--accent-navy-hover);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+  color: #ffffff !important;
+}
+
+.btn-circle-mint {
+  background: var(--mint-accent);
+  color: #0a0f0d;
+  border: none;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+body.dark-mode .btn-circle-mint {
+  background: #0072ce;
+  color: #ffffff;
+}
+
+.btn-circle-mint:hover {
+  background: #005fa8;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+}
+
+/* Tech / Badge Pills */
+.pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--bg-card-subtle);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 2rem;
+  padding: 0.28rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, color 0.2s ease;
+}
+
+.pill-badge:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0, 114, 206, 0.25);
+  color: var(--text-h);
+}
+
+/* Minimal Card Box */
+.clean-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-subtle);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease, border-color 0.25s ease, background-color 0.3s ease;
+}
+
+.clean-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+  border-color: rgba(0, 114, 206, 0.22);
 }

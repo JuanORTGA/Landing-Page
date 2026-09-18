@@ -13,11 +13,14 @@ interface PageContent {
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string) => any;
   loading: boolean;
+  updateTranslation: (key: string, updates: Partial<PageContent>) => void;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+import EditableText from '../components/admin/EditableText';
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>(() => {
@@ -57,20 +60,59 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   useEffect(() => {
     try {
       localStorage.setItem('app-language', language);
-    } catch {}
+    } catch {
+      // Ignorar si el almacenamiento local está restringido
+    }
     document.documentElement.lang = language;
   }, [language]);
 
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'UPDATE_TRANSLATION') {
+        setContent(prev => ({
+          ...prev,
+          [event.data.key]: {
+            ...(prev[event.data.key] || { key: event.data.key, content_es: '', content_en: '', content_et: '' }),
+            ...event.data.updates
+          }
+        }));
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
   const t = (key: string) => {
     const item = content[key];
-    if (!item) return key;
+    if (!item && key.startsWith('image_')) return key;
     
-    const translation = item[`content_${language}` as keyof PageContent];
-    return translation || item.content_es || key;
+    const raw = item ? item[`content_${language}` as keyof PageContent] : undefined;
+    let translation = raw || (item ? item.content_es : key) || key;
+
+    // Sanitize kicker fields: remove leading bullet symbols (•, ▸, ▪, etc.) from DB values
+    if (key.endsWith('_kicker') || key === 'card_kicker') {
+      translation = translation.replace(/^[\u2022\u25b8\u25aa\u2013\u2014-]\s*/u, '').trim();
+    }
+
+    if (window.self !== window.top && !key.startsWith('image_') && !key.startsWith('cv_') && typeof window !== 'undefined') {
+      return <EditableText key={key} tKey={key} initialText={translation} />;
+    }
+
+    return translation;
+  };
+
+  const updateTranslation = (key: string, updates: Partial<PageContent>) => {
+    setContent(prev => ({
+      ...prev,
+      [key]: {
+        ...(prev[key] || { key, content_es: '', content_en: '', content_et: '' }),
+        ...updates
+      }
+    }));
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, loading }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, loading, updateTranslation }}>
       {children}
     </LanguageContext.Provider>
   );

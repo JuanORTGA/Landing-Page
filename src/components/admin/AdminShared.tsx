@@ -4,7 +4,7 @@ import { Check, AlertCircle } from 'lucide-react';
 
 interface ToastProps {
   message: string;
-  type: 'success' | 'error';
+  type: 'success' | 'error' | 'info';
 }
 
 export const Toast: React.FC<ToastProps> = ({ message, type }) => (

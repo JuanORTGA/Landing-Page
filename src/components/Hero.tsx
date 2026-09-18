@@ -2,16 +2,59 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { supabase } from '../services/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Download, ChevronRight, Code, Database, Layout, Sparkles, X } from 'lucide-react';
+import { Download, ArrowDownRight, X, FileText } from 'lucide-react';
+import { SpanishFlag, UkFlag, EstonianFlag } from './icons/LanguageFlags';
+
+// Carga automática de todas las imágenes hero-*.jpg de src/assets/
+const heroImageModules = import.meta.glob<{ default: string }>('../assets/hero-*.{jpg,jpeg,png,webp}', { eager: true });
+
+const dynamicHeroBackgrounds = Object.entries(heroImageModules).map(([, mod], idx) => ({
+  id: idx + 1,
+  url: typeof mod === 'string' ? mod : mod.default,
+  title: `Foto ${idx + 1}`,
+}));
+
+const fallbackBackgrounds = [
+  {
+    id: 1,
+    url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=2000&q=85',
+    title: 'Tallinn Modern District',
+  }
+];
 
 const Hero: React.FC = () => {
   const { language, t } = useLanguage();
-  const [text, setText] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [loopNum, setLoopNum] = useState(0);
-  const [typingSpeed, setTypingSpeed] = useState(150);
   const [isCvModalOpen, setIsCvModalOpen] = useState(false);
   const [allCvs, setAllCvs] = useState<Record<string, string>>({});
+  
+  // Fondos personalizados desde Supabase o fallback a assets locales
+  const customBgsRaw = t('image_hero_backgrounds');
+  let customBgs: { id: number; url: string; title: string }[] = [];
+  try {
+    if (customBgsRaw && customBgsRaw !== 'image_hero_backgrounds') {
+      const parsed = JSON.parse(customBgsRaw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        customBgs = parsed.map((url: string, idx: number) => ({ id: idx + 1, url, title: `Foto ${idx + 1}` }));
+      }
+    }
+  } catch (_e) {
+    // Ignorar error de parseo y usar fondos locales
+  }
+
+  const heroBackgrounds = customBgs.length > 0 
+    ? customBgs 
+    : (dynamicHeroBackgrounds.length > 0 ? dynamicHeroBackgrounds : fallbackBackgrounds);
+
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Rotación continua cada 6 segundos
+  useEffect(() => {
+    if (heroBackgrounds.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroBackgrounds.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [heroBackgrounds.length]);
 
   const getT = (key: string, fallback: string) => {
     const val = t(key);
@@ -20,21 +63,43 @@ const Hero: React.FC = () => {
 
   const getFallback = (key: string) => {
     const fallbacks: Record<string, Record<string, string>> = {
-      hero_badge: { es: 'Full-Stack Developer', en: 'Full-Stack Developer', et: 'Full-Stack Arendaja' },
-      hero_specialist: { es: 'Especialista en:', en: 'Specialist in:', et: 'Spetsialist:' },
-      role_1: { es: 'T.S.U en Informática', en: 'Computer Science Technician', et: 'Informaatika tehnik' },
-      role_2: { es: 'Ingeniería en Informática (2026)', en: 'Computer Engineering (2026)', et: 'Informaatikainsener (2026)' },
-      role_3: { es: 'Full-Stack Developer (Python, Django, React)', en: 'Full-Stack Developer (Python, Django, React)', et: 'Full-Stack Arendaja (Python, Django, React)' },
-      hero_tagline: { 
-        es: 'Disponible para reubicación en Estonia (requiere patrocinio de visa de trabajo)', 
-        en: 'Available for relocation to Estonia (requires work visa sponsorship)', 
-        et: 'Saadaval ümberasumiseks Eestisse (vajab tööviisa sponsorlust)' 
+      hero_kicker: { 
+        es: 'Full-Stack Developer', 
+        en: 'Full-Stack Developer', 
+        et: 'Full-Stack Tarkvaraarendaja' 
       },
-      floating_1: { es: 'Desarrollo Web', en: 'Web Development', et: 'Veebiarendus' },
-      floating_2: { es: 'Optimización SQL', en: 'SQL Optimization', et: 'SQL optimeerimine' },
-      floating_3: { es: 'Arquitectura Segura', en: 'Secure Architecture', et: 'Turvaline arhitektuur' },
-      view_projects: { es: 'Ver proyectos', en: 'View projects', et: 'Vaata projekte' },
+      hero_title: { 
+        es: 'Desarrollo web con foco en arquitectura, rendimiento y código limpio.', 
+        en: 'Web development focused on architecture, performance, and clean code.', 
+        et: 'Veebiarendus, mis keskendub arhitektuurile, jõudlusele ja puhtale koodile.' 
+      },
+      hero_tagline: { 
+        es: 'Hola, soy Juan Ortega. Especializado en crear aplicaciones web modernas, bases de datos eficientes e interfaces intuitivas.', 
+        en: 'Hi, I’m Juan Ortega. Specialized in building modern web apps, efficient databases, and intuitive user interfaces.', 
+        et: 'Tere, olen Juan Ortega. Spetsialiseerunud kaasaegsete veebirakenduste, tõhusate andmebaaside ja intuitiivsete kasutajaliideste loomisele.' 
+      },
+      specialty_label: { es: 'ESPECIALIDAD', en: 'SPECIALTY', et: 'SPETSIALISEERUMINE' },
+      specialty_val: { es: 'Software & Web Development', en: 'Software & Web Development', et: 'Tarkvara ja veebiarendus' },
+      objective_label: { es: 'OBJETIVO', en: 'OBJECTIVE', et: 'EESMÄRK' },
+      objective_val: { es: 'Crecer en el ecosistema estonio', en: 'Grow within the Estonian ecosystem', et: 'Kasvada Eesti digiökosüsteemis' },
+      status_label: { es: 'DISPONIBILIDAD', en: 'AVAILABILITY', et: 'SAADAVUS' },
+      status_val: { es: 'Inmediata / Proyectos', en: 'Immediate / Projects', et: 'Koheselt saadaval' },
       download_cv: { es: 'Descargar CV', en: 'Download CV', et: 'Laadi alla CV' },
+      cv_modal_hint: { 
+        es: 'Selecciona la versión de idioma para ver o descargar el Curriculum Vitae:', 
+        en: 'Select the language version to view or download the Curriculum Vitae:', 
+        et: 'Vali keeleversioon elulookirjelduse (CV) vaatamiseks või allalaadimiseks:' 
+      },
+      cv_status_ready: {
+        es: 'Disponible para descarga',
+        en: 'Available for download',
+        et: 'Saadaval allalaadimiseks'
+      },
+      cv_status_base: {
+        es: 'Archivo base listo',
+        en: 'Base file ready',
+        et: 'Põhifail valmis'
+      },
       cv_not_available: { 
         es: 'El CV en este idioma no está disponible actualmente.', 
         en: 'The CV in this language is not currently available.', 
@@ -46,245 +111,183 @@ const Hero: React.FC = () => {
 
   useEffect(() => {
     const fetchCVs = async () => {
-      const { data, error } = await supabase
-        .from('cv_files')
-        .select('lang, file_url');
-      
-      if (!error && data) {
-        const cvMap = data.reduce((acc: any, curr: any) => {
-          acc[curr.lang] = curr.file_url;
-          return acc;
-        }, {});
-        setAllCvs(cvMap);
+      try {
+        const { data, error } = await supabase
+          .from('cv_files')
+          .select('lang, file_url');
+        
+        if (!error && data) {
+          const cvMap = data.reduce((acc: any, curr: any) => {
+            acc[curr.lang] = curr.file_url;
+            return acc;
+          }, {});
+          setAllCvs(cvMap);
+        }
+      } catch (err) {
+        console.error('Error fetching CV files:', err);
       }
     };
     fetchCVs();
   }, [language]);
 
-  const handleDownloadClick = () => {
-    setIsCvModalOpen(true);
-  };
-
-  const handleDownloadVersion = async (lang: string) => {
+  const handleDownloadVersion = (lang: string) => {
     const url = allCvs[lang];
     if (url) {
-      try {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        const blobUrl = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        
-        // Custom filename based on language
-        let fileName = `CV_Juan_Ortega_${lang}.pdf`;
-        if (lang === 'es') fileName = 'CV Juan Ortega Version Espanish.pdf';
-        else if (lang === 'en') fileName = 'CV Juan Ortega Version English.pdf';
-        else if (lang === 'et') fileName = 'CV Juan Ortega Version Estonian.pdf';
-        
-        link.download = fileName;
-        
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(blobUrl);
-      } catch (error) {
-        console.error('Download failed:', error);
-        window.open(url, '_blank');
-      }
+      window.open(url, '_blank');
       setIsCvModalOpen(false);
     } else {
       alert(getT('cv_not_available', getFallback('cv_not_available')));
     }
   };
 
-  const roles = [
-    getT('role_1', getFallback('role_1')),
-    getT('role_2', getFallback('role_2')),
-    getT('role_3', getFallback('role_3'))
-  ];
-
-  useEffect(() => {
-    const handleType = () => {
-      const i = loopNum % roles.length;
-      const fullText = roles[i];
-
-      setText(isDeleting 
-        ? fullText.substring(0, text.length - 1) 
-        : fullText.substring(0, text.length + 1)
-      );
-
-      setTypingSpeed(isDeleting ? 100 : 150);
-
-      if (!isDeleting && text === fullText) {
-        setTimeout(() => setIsDeleting(true), 2000);
-      } else if (isDeleting && text === '') {
-        setIsDeleting(false);
-        setLoopNum(loopNum + 1);
-      }
-    };
-
-    const timer = setTimeout(handleType, typingSpeed);
-    return () => clearTimeout(timer);
-  }, [text, isDeleting, loopNum, typingSpeed, roles]);
-
   return (
-    <section id="hero" className="hero-section">
-      <Sparkles className="bg-sparkle s-1" size={32} />
-      <Sparkles className="bg-sparkle s-2" size={24} />
-      <Sparkles className="bg-sparkle s-3" size={40} />
+    <section id="hero" className="hero-root">
+      {/* 100% Full-Screen Panoramic Rotating Background (Cinema Mode) */}
+      <div className="hero-full-bg-layer" aria-hidden="true">
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={currentSlide}
+            className="hero-full-bg-image"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.4, ease: "easeInOut" }}
+            style={{
+              backgroundImage: `url(${heroBackgrounds[currentSlide]?.url})`
+            }}
+          />
+        </AnimatePresence>
+
+        {/* Tinte Fílmico Luminoso que resalta las fotos de fondo */}
+        <div className="hero-cinema-overlay"></div>
+      </div>
 
       <div className="container hero-container">
         <motion.div 
-          initial={{ opacity: 0, y: 30 }}
+          className="hero-cinema-content"
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="hero-content"
+          transition={{ duration: 0.7 }}
         >
-          <motion.div 
-            className="hero-badge glass"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            <span className="badge-dot"></span>
-            {getT('hero_badge', getFallback('hero_badge'))}
-          </motion.div>
-          
-          <h1 className="hero-title">
-            {getT('hero_name', 'Juan Ortega: Full-Stack Developer')}
-          </h1>
-          
-          <div className="typewriter-wrapper">
-            <span className="type-prefix">{getT('hero_specialist', getFallback('hero_specialist'))} </span>
-            <span className="typewriter">{text}</span>
-            <span className="cursor">|</span>
+          {/* Kicker Superior Limpio y Elegante */}
+          <div className="hero-estonia-kicker-clean">
+            {(() => {
+              const rawText = getT('hero_kicker', getFallback('hero_kicker'));
+              
+              if (typeof rawText === 'string') {
+                // Elimina viñetas y cualquier remanente de "ESTONIA · GLOBAL" o similar
+                const cleaned = rawText
+                  .replace(/^[•·\-\s]+/, '')
+                  .replace(/\s*(?:[·/|]\s*)?(?:ESTONIA\s*[·/]\s*GLOBAL|EESTI\s*[·/]\s*GLOBAALNE)\s*/gi, '')
+                  .trim();
+
+                return <span className="hero-kicker-role">{cleaned || rawText}</span>;
+              }
+              return <span className="hero-kicker-role">{rawText}</span>;
+            })()}
           </div>
 
-          <p className="hero-tagline">
+          {/* Main Title Nítido y de Alto Impacto */}
+          <h1 className="hero-headline hero-headline-cinema">
+            {getT('hero_title', getFallback('hero_title'))}
+          </h1>
+
+          {/* Body Bio */}
+          <p className="hero-body-text hero-body-cinema">
             {getT('hero_tagline', getFallback('hero_tagline'))}
           </p>
 
-          <div className="hero-btns">
-            <a href="#projects" className="btn btn-primary">
-              {getT('view_projects', getFallback('view_projects'))} <ChevronRight size={18} />
-            </a>
-            <button className="btn btn-secondary" onClick={handleDownloadClick}>
-              {getT('download_cv', getFallback('download_cv'))} <Download size={18} />
+          {/* Botones de Acción de Alto Nivel con Cristal Nórdico y Animación Sutil */}
+          <div className="hero-action-buttons">
+            <button 
+              className="hero-cv-pill-btn" 
+              onClick={() => setIsCvModalOpen(true)}
+              aria-label="Descargar Curriculum Vitae"
+            >
+              <Download size={17} className="btn-download-icon" />
+              <span>{getT('download_cv', getFallback('download_cv'))}</span>
             </button>
-          </div>
-        </motion.div>
 
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.3 }}
-          className="hero-image-container"
-        >
-          <div className="hero-blob-bg"></div>
-          
-          <div className="floating-cards">
-            <div className="code-window-wrapper">
-              <motion.div 
-                className="code-window"
-                animate={{ y: [0, -15, 0], rotate: [-2, -2, -2] }}
-                transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-              >
-                <div className="code-header">
-                  <span className="dot red"></span>
-                  <span className="dot yellow"></span>
-                  <span className="dot green"></span>
-                </div>
-                <div className="code-body">
-                  <pre>
-                    <code>
-                      <span className="keyword">const</span> <span className="variable">developer</span> = {'{'}<br/>
-                      &nbsp;&nbsp;<span className="property">name</span>: <span className="string">"Juan Ortega"</span>,<br/>
-                      &nbsp;&nbsp;<span className="property">role</span>: <span className="string">"Full-Stack"</span>,<br/>
-                      &nbsp;&nbsp;<span className="property">skills</span>: [<span className="string">"Python"</span>, <span className="string">"React"</span>],<br/>
-                      &nbsp;&nbsp;<span className="property">status</span>: <span className="string">"OpenToWork"</span><br/>
-                      {'}'};
-                    </code>
-                  </pre>
-                </div>
-              </motion.div>
+            <a 
+              href="#vision" 
+              className="hero-arrow-circle-btn"
+              aria-label="Explorar perfil y proyectos"
+              title="Explorar perfil"
+            >
+              <ArrowDownRight size={19} className="btn-arrow-icon" />
+            </a>
+          </div>
+
+          {/* Sub-Footer Metric Row con 3 Columnas Perfectamente Equilibradas */}
+          <div className="hero-subfooter-cinema">
+            <div className="subfooter-col">
+              <span className="subfooter-label-estonia">{getT('specialty_label', getFallback('specialty_label'))}</span>
+              <span className="subfooter-value-cinema">{getT('specialty_val', getFallback('specialty_val'))}</span>
             </div>
 
-            <motion.div 
-              className="float-card card-1 glass"
-              animate={{ y: [0, -20, 0], rotate: [-10, -8, -10] }}
-              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-            >
-              <div className="card-icon-wrapper">
-                <Layout size={20} />
-              </div>
-              <span className="card-label">{getT('floating_1', getFallback('floating_1'))}</span>
-            </motion.div>
+            <div className="subfooter-col">
+              <span className="subfooter-label-estonia">{getT('objective_label', getFallback('objective_label'))}</span>
+              <span className="subfooter-value-cinema">{getT('objective_val', getFallback('objective_val'))}</span>
+            </div>
 
-            <motion.div 
-              className="float-card card-2 glass"
-              animate={{ y: [0, 25, 0], rotate: [5, 7, 5] }}
-              transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 1 }}
-            >
-              <div className="card-icon-wrapper">
-                <Database size={20} />
-              </div>
-              <span className="card-label">{getT('floating_2', getFallback('floating_2'))}</span>
-            </motion.div>
-
-            <motion.div 
-              className="float-card card-3 glass"
-              animate={{ y: [0, -25, 0], rotate: [15, 13, 15] }}
-              transition={{ repeat: Infinity, duration: 4.5, ease: "easeInOut", delay: 2 }}
-            >
-              <div className="card-icon-wrapper">
-                <Code size={20} />
-              </div>
-              <span className="card-label">{getT('floating_3', getFallback('floating_3'))}</span>
-            </motion.div>
+            <div className="subfooter-col">
+              <span className="subfooter-label-estonia">{getT('status_label', getFallback('status_label'))}</span>
+              <span className="subfooter-value-cinema">
+                {getT('status_val', getFallback('status_val'))}
+              </span>
+            </div>
           </div>
         </motion.div>
       </div>
 
-      {/* CV Selection Modal */}
+      {/* CV Modal */}
       <AnimatePresence>
         {isCvModalOpen && (
-          <div className="cv-modal-overlay" onClick={() => setIsCvModalOpen(false)}>
+          <div className="cv-modal-backdrop" onClick={() => setIsCvModalOpen(false)}>
             <motion.div 
-              className="cv-modal glass"
-              onClick={e => e.stopPropagation()}
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="cv-modal-card"
+              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
             >
               <div className="cv-modal-header">
-                <h3>{getT('download_cv', getFallback('download_cv'))}</h3>
-                <button className="close-btn" onClick={() => setIsCvModalOpen(false)}><X size={20} /></button>
+                <div className="cv-modal-title-group">
+                  <FileText className="cv-icon-title" size={20} />
+                  <h3>{getT('download_cv', getFallback('download_cv'))}</h3>
+                </div>
+                <button className="cv-close-btn" onClick={() => setIsCvModalOpen(false)} aria-label="Cerrar modal">
+                  <X size={16} />
+                </button>
               </div>
-              <p className="cv-modal-desc">Select the Curriculum version you would like to download:</p>
-              <div className="cv-options">
-                <button className="cv-opt-btn" onClick={() => handleDownloadVersion('es')}>
-                  <span className="lang-flag">🇪🇸</span>
-                  <div className="opt-text">
-                    <span className="lang-name">Spanish</span>
-                    <span className="lang-status">{allCvs['es'] ? 'Available' : 'Not available'}</span>
+              <p className="cv-modal-hint">{getT('cv_modal_hint', getFallback('cv_modal_hint'))}</p>
+
+              <div className="cv-options-list">
+                <button className="cv-item-btn" onClick={() => handleDownloadVersion('es')}>
+                  <span className="cv-flag"><SpanishFlag width={22} height={16} /></span>
+                  <div className="cv-item-info">
+                    <span className="cv-item-name">Español (Spanish)</span>
+                    <span className="cv-item-status">{allCvs['es'] ? getT('cv_status_ready', getFallback('cv_status_ready')) : getT('cv_status_base', getFallback('cv_status_base'))}</span>
                   </div>
-                  <Download size={18} />
+                  <Download size={16} />
                 </button>
-                <button className="cv-opt-btn" onClick={() => handleDownloadVersion('en')}>
-                  <span className="lang-flag">🇬🇧</span>
-                  <div className="opt-text">
-                    <span className="lang-name">English</span>
-                    <span className="lang-status">{allCvs['en'] ? 'Available' : 'Not available'}</span>
+
+                <button className="cv-item-btn" onClick={() => handleDownloadVersion('en')}>
+                  <span className="cv-flag"><UkFlag width={22} height={16} /></span>
+                  <div className="cv-item-info">
+                    <span className="cv-item-name">English</span>
+                    <span className="cv-item-status">{allCvs['en'] ? getT('cv_status_ready', getFallback('cv_status_ready')) : getT('cv_status_base', getFallback('cv_status_base'))}</span>
                   </div>
-                  <Download size={18} />
+                  <Download size={16} />
                 </button>
-                <button className="cv-opt-btn" onClick={() => handleDownloadVersion('et')}>
-                  <span className="lang-flag">🇪🇪</span>
-                  <div className="opt-text">
-                    <span className="lang-name">Estonian</span>
-                    <span className="lang-status">{allCvs['et'] ? 'Available' : 'Not available'}</span>
+
+                <button className="cv-item-btn" onClick={() => handleDownloadVersion('et')}>
+                  <span className="cv-flag"><EstonianFlag width={22} height={16} /></span>
+                  <div className="cv-item-info">
+                    <span className="cv-item-name">Eesti keel (Estonian)</span>
+                    <span className="cv-item-status">{allCvs['et'] ? getT('cv_status_ready', getFallback('cv_status_ready')) : getT('cv_status_base', getFallback('cv_status_base'))}</span>
                   </div>
-                  <Download size={18} />
+                  <Download size={16} />
                 </button>
               </div>
             </motion.div>
@@ -293,336 +296,445 @@ const Hero: React.FC = () => {
       </AnimatePresence>
 
       <style>{`
-        .hero-section {
-          min-height: 100vh;
+        .hero-root {
+          padding-top: 7rem;
+          padding-bottom: 3.5rem;
+          position: relative;
+          overflow: hidden;
+          background: #080d12;
+          min-height: 82vh;
           display: flex;
           align-items: center;
-          position: relative;
-          padding-top: 8rem;
+        }
+
+        /* 100% Full-Screen Panoramic Rotating Background */
+        .hero-full-bg-layer {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 0;
           overflow: hidden;
         }
-        .bg-sparkle {
-          position: absolute;
-          color: var(--text-h);
-          opacity: 0.15;
-          animation: pulse 4s infinite alternate;
-        }
-        .s-1 { top: 20%; left: 10%; }
-        .s-2 { top: 40%; right: 45%; }
-        .s-3 { bottom: 20%; left: 40%; color: var(--primary); }
 
-        @keyframes pulse {
-          0% { transform: scale(0.8) rotate(0deg); opacity: 0.2; }
-          100% { transform: scale(1.2) rotate(45deg); opacity: 0.6; }
+        .hero-full-bg-image {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 118%;
+          top: -2%;
+          background-size: cover;
+          background-position: center 68%;
+          filter: saturate(115%) brightness(106%) contrast(104%);
+        }
+
+        /* Tinte Fílmico Luminoso */
+        .hero-cinema-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            90deg, 
+            rgba(8, 13, 18, 0.72) 0%, 
+            rgba(8, 13, 18, 0.44) 45%, 
+            rgba(8, 13, 18, 0.10) 80%, 
+            transparent 100%
+          ),
+          linear-gradient(
+            180deg, 
+            rgba(8, 13, 18, 0.22) 0%, 
+            transparent 45%, 
+            rgba(8, 13, 18, 0.42) 100%
+          );
         }
 
         .hero-container {
-          display: grid;
-          grid-template-columns: 1.1fr 0.9fr;
-          align-items: center;
-          gap: 2rem;
-          z-index: 2;
-        }
-        .hero-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.5rem 1.2rem;
-          border-radius: 2rem;
-          font-family: var(--heading);
-          font-weight: 600;
-          font-size: 0.9rem;
-          color: var(--primary);
-          margin-bottom: 1.5rem;
-          background: rgba(168, 85, 247, 0.1);
-          border: 1px solid rgba(168, 85, 247, 0.3);
-        }
-        .badge-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: var(--primary);
-          box-shadow: 0 0 10px var(--primary);
-        }
-        .hero-title {
-          font-size: 4.5rem;
-          line-height: 1.1;
-          margin-bottom: 1rem;
-        }
-        .typewriter-wrapper {
-          font-size: 2rem;
-          font-family: var(--heading);
-          font-weight: 700;
-          margin-bottom: 1.5rem;
-          display: flex;
-          align-items: center;
-          flex-wrap: wrap;
-        }
-        .type-prefix {
-          color: var(--text);
-          margin-right: 0.8rem;
-        }
-        .typewriter {
-          background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-        .cursor {
-          color: var(--primary);
-          animation: blink 1s infinite;
-        }
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
-        }
-        .hero-tagline {
-          font-size: 1.2rem;
-          color: var(--text);
-          margin-bottom: 3rem;
-          max-width: 500px;
-          line-height: 1.6;
-        }
-        .hero-btns {
-          display: flex;
-          gap: 1.5rem;
-        }
-        
-        .hero-image-container {
           position: relative;
-          height: 500px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .hero-blob-bg {
-          position: absolute;
-          width: 400px;
-          height: 400px;
-          background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-          border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
-          filter: blur(60px);
-          opacity: 0.5;
-          animation: blobShape 15s infinite alternate ease-in-out;
-        }
-        @keyframes blobShape {
-          0% { transform: scale(1) rotate(0deg); border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
-          100% { transform: scale(1.1) rotate(20deg); border-radius: 60% 40% 30% 70% / 50% 60% 40% 60%; }
-        }
-        .floating-cards {
-          position: relative;
-          width: 100%;
-          height: 100%;
-          perspective: 1000px;
-        }
-        .code-window-wrapper {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
           z-index: 1;
         }
-        .code-window {
-          width: 380px;
-          background: var(--code-bg);
-          border-radius: 1rem;
-          box-shadow: var(--shadow);
-          border: 1px solid var(--border);
-          overflow: hidden;
-        }
-        .code-header {
-          background: rgba(0,0,0,0.05);
-          padding: 0.8rem 1rem;
-          display: flex;
-          gap: 0.5rem;
-          border-bottom: 1px solid var(--border);
-        }
-        .dot {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-        }
-        .dot.red { background: #ff5f56; }
-        .dot.yellow { background: #ffbd2e; }
-        .dot.green { background: #27c93f; }
-        .code-body {
-          padding: 1.5rem;
-          font-family: var(--mono);
-          font-size: 1rem;
-          line-height: 1.6;
-          color: var(--text);
-          text-align: left;
-        }
-        .code-body pre { margin: 0; }
-        .code-body .keyword { color: #c678dd; }
-        .code-body .variable { color: #61afef; }
-        .code-body .property { color: #e06c75; }
-        .code-body .string { color: #98c379; }
 
-        .float-card {
-          position: absolute;
-          padding: 0.8rem 1.2rem;
-          border-radius: 1.2rem;
+        .hero-cinema-content {
+          max-width: 680px;
+        }
+
+        /* Kicker Superior del Hero */
+        .hero-estonia-kicker-clean {
+          display: inline-flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 0.85rem;
+          font-family: var(--font-heading);
+          font-size: 0.92rem;
+          font-weight: 700;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          margin-bottom: 1.4rem;
+        }
+
+        .hero-kicker-role {
+          color: #ffffff;
+          font-weight: 800;
+          letter-spacing: 0.05em;
+        }
+
+        .hero-kicker-sep {
+          width: 1px;
+          height: 14px;
+          background: rgba(147, 197, 253, 0.45);
+          display: inline-block;
+          flex-shrink: 0;
+          margin: 0 0.2rem;
+        }
+
+        .hero-kicker-focus {
+          color: #38bdf8;
+          font-weight: 700;
+          letter-spacing: 0.04em;
+        }
+
+        .kicker-blue-dot {
+          display: none;
+        }
+
+        /* Titular Cinema */
+        .hero-headline-cinema {
+          font-family: var(--font-heading);
+          font-size: 2.35rem;
+          line-height: 1.18;
+          color: #ffffff !important;
+          font-weight: 800;
+          letter-spacing: -0.03em;
+          margin-bottom: 1.1rem;
+          text-shadow: 0 2px 16px rgba(0, 0, 0, 0.85), 0 4px 30px rgba(0, 0, 0, 0.7);
+        }
+
+        @media (max-width: 768px) {
+          .hero-headline-cinema {
+            font-size: 1.95rem;
+            line-height: 1.2;
+          }
+        }
+
+        /* Bio Text Cinema */
+        .hero-body-cinema {
+          font-size: 0.98rem;
+          line-height: 1.62;
+          color: #ffffff !important;
+          max-width: 520px;
+          margin-bottom: 1.85rem;
+          text-shadow: 0 1px 10px rgba(0, 0, 0, 0.8), 0 2px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Action Buttons en Cristal Nórdico con Animación Física Realista */
+        .hero-action-buttons {
           display: flex;
           align-items: center;
-          gap: 0.8rem;
-          box-shadow: var(--shadow);
-          z-index: 2;
-          background: var(--bg-card);
-          backdrop-filter: blur(10px);
-          border: 1px solid var(--border);
-          width: auto;
-          min-width: 150px;
+          gap: 1rem;
+          margin-bottom: 2.25rem;
         }
-        .card-icon-wrapper {
-          width: 36px;
-          height: 36px;
-          background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-          color: white;
-          border-radius: 10px;
+
+        /* Botón Principal Píldora de Cristal */
+        .hero-cv-pill-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.65rem;
+          background: rgba(13, 20, 30, 0.82);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1.5px solid rgba(255, 255, 255, 0.2);
+          color: #ffffff !important;
+          padding: 0.78rem 1.6rem;
+          border-radius: 2.5rem;
+          font-family: var(--font-heading);
+          font-size: 0.92rem;
+          font-weight: 700;
+          letter-spacing: 0.01em;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+          cursor: pointer;
+          transition: all 0.25s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .hero-cv-pill-btn::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(135deg, rgba(0, 114, 206, 0.85) 0%, rgba(2, 132, 199, 0.9) 100%);
+          opacity: 0;
+          transition: opacity 0.25s ease;
+          z-index: 0;
+        }
+
+        .hero-cv-pill-btn > * {
+          position: relative;
+          z-index: 1;
+        }
+
+        .hero-cv-pill-btn .btn-download-icon {
+          transition: transform 0.25s ease;
+        }
+
+        .hero-cv-pill-btn:hover {
+          transform: translateY(-1.5px);
+          border-color: rgba(255, 255, 255, 0.28);
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-cv-pill-btn:hover::before {
+          opacity: 1;
+        }
+
+        .hero-cv-pill-btn:hover .btn-download-icon {
+          transform: translateY(1px);
+        }
+
+        .hero-cv-pill-btn:active {
+          transform: translateY(0);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Botón Secundario Circular de Cristal */
+        .hero-arrow-circle-btn {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 5px 15px rgba(168, 85, 247, 0.4);
+          background: rgba(13, 20, 30, 0.82);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1.5px solid rgba(255, 255, 255, 0.2);
+          color: #ffffff !important;
+          box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+          cursor: pointer;
+          transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, box-shadow 0.22s ease, border-color 0.2s ease;
+          text-decoration: none;
         }
-        .card-label {
-          font-family: var(--heading);
-          font-weight: 600;
-          font-size: 0.95rem;
-          color: var(--text-h);
-          white-space: nowrap;
-        }
-        .card-1 { top: 5%; left: 0%; }
-        .card-2 { bottom: 10%; left: 10%; }
-        .card-3 { top: 25%; right: -5%; }
 
-        @media (max-width: 1024px) {
-          .hero-container {
-            grid-template-columns: 1fr;
-            text-align: center;
-            padding-top: 4rem;
-          }
-          .hero-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-          }
-          .hero-title { font-size: 3.5rem; }
-          .typewriter-wrapper { justify-content: center; }
-          .hero-tagline { margin: 0 auto 2.5rem; }
-          .hero-image-container { height: 400px; }
-          .hero-blob-bg { width: 300px; height: 300px; }
+        .hero-arrow-circle-btn .btn-arrow-icon {
+          transition: transform 0.2s ease;
         }
-        @media (max-width: 480px) {
-          .hero-btns { flex-direction: column; width: 100%; }
-          .btn { width: 100%; justify-content: center; }
-          .float-card { min-width: 130px; padding: 0.6rem 1rem; }
+
+        .hero-arrow-circle-btn:hover {
+          transform: translateY(-1.5px);
+          background: rgba(0, 114, 206, 0.85);
+          border-color: rgba(255, 255, 255, 0.28);
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-arrow-circle-btn:hover .btn-arrow-icon {
+          transform: translate(1px, 1px);
+        }
+
+        .hero-arrow-circle-btn:active {
+          transform: translateY(0);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Subfooter Row Cinema con 3 Columnas */
+        .hero-subfooter-cinema {
+          display: flex;
+          gap: 2.75rem;
+          padding-top: 1.5rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.15);
+          flex-wrap: wrap;
+        }
+
+        .subfooter-col {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+
+        .subfooter-label-estonia {
+          font-family: var(--font-mono);
+          font-size: 0.68rem;
+          font-weight: 700;
+          color: #0072ce !important; /* Azul Bandera de Estonia */
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+
+        .subfooter-value-cinema {
+          font-family: var(--font-heading);
+          font-size: 0.94rem;
+          font-weight: 700;
+          color: #ffffff !important;
+          text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        .status-val-with-dot {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+        }
+
+        .status-live-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: #10b981;
+          box-shadow: 0 0 8px #10b981;
+          display: inline-block;
+        }
+
+        @media (max-width: 640px) {
+          .hero-cinema-content {
+            padding-top: 2rem;
+          }
+          .hero-headline-cinema {
+            font-size: clamp(1.75rem, 6.5vw, 2.1rem);
+            line-height: 1.2;
+            margin-bottom: 0.85rem;
+          }
+          .hero-body-cinema {
+            font-size: 0.92rem;
+            line-height: 1.55;
+            margin-bottom: 1.5rem;
+          }
+          .hero-action-buttons {
+            gap: 0.75rem;
+            margin-bottom: 1.85rem;
+          }
+          .hero-cv-pill-btn {
+            padding: 0.7rem 1.35rem;
+            font-size: 0.88rem;
+          }
+          .hero-subfooter-cinema {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.1rem 1rem;
+            padding-top: 1.25rem;
+          }
+          .hero-subfooter-cinema .subfooter-col:last-child {
+            grid-column: span 2;
+          }
         }
 
         /* CV Modal Styles */
-        .cv-modal-overlay {
+        .cv-modal-backdrop {
           position: fixed;
           inset: 0;
-          background: rgba(0, 0, 0, 0.8);
-          backdrop-filter: blur(8px);
+          background: rgba(8, 13, 18, 0.65);
+          backdrop-filter: blur(10px);
           display: flex;
           align-items: center;
           justify-content: center;
-          z-index: 1000;
+          z-index: 2000;
           padding: 1.5rem;
         }
-        .cv-modal {
+
+        .cv-modal-card {
           width: 100%;
-          max-width: 450px;
-          padding: 2.5rem;
-          border-radius: 2rem;
+          max-width: 440px;
+          background: var(--bg-card);
           border: 1px solid var(--border);
-          box-shadow: var(--shadow);
-          position: relative;
-          background: var(--bg);
+          border-radius: 1.5rem;
+          padding: 2rem;
+          box-shadow: var(--shadow-lg);
         }
+
         .cv-modal-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 1.5rem;
+          margin-bottom: 0.75rem;
         }
+
+        .cv-modal-title-group {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .cv-icon-title {
+          color: #0072ce;
+        }
+
         .cv-modal-header h3 {
-          font-size: 1.8rem;
-          color: var(--text-h);
+          font-size: 1.25rem;
           margin: 0;
-        }
-        .close-btn {
-          background: var(--bg-card);
           color: var(--text-h);
+        }
+
+        .cv-close-btn {
+          background: var(--bg-card-subtle);
           border: 1px solid var(--border);
-          width: 36px;
-          height: 36px;
+          color: var(--text-muted);
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          cursor: pointer;
           transition: all 0.2s;
         }
-        .close-btn:hover {
-          background: rgba(239, 68, 68, 0.1);
-          color: #ef4444;
-          border-color: #ef4444;
+
+        .cv-close-btn:hover {
+          color: var(--text-h);
+          border-color: #0072ce;
         }
-        .cv-modal-desc {
+
+        .cv-modal-hint {
+          font-size: 0.85rem;
           color: var(--text);
-          margin-bottom: 2rem;
-          font-size: 1rem;
-          opacity: 0.8;
+          margin-bottom: 1.5rem;
+          line-height: 1.5;
         }
-        .cv-options {
+
+        .cv-options-list {
           display: flex;
           flex-direction: column;
-          gap: 1rem;
+          gap: 0.75rem;
         }
-        .cv-opt-btn {
+
+        .cv-item-btn {
           display: flex;
           align-items: center;
-          gap: 1.5rem;
-          padding: 1.2rem 1.5rem;
-          background: var(--bg-card);
+          gap: 1rem;
+          padding: 0.85rem 1.1rem;
+          background: var(--bg-card-subtle);
           border: 1px solid var(--border);
-          border-radius: 1.2rem;
+          border-radius: 1rem;
           color: var(--text-h);
-          cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           text-align: left;
+          transition: all 0.25s ease;
           width: 100%;
         }
-        .cv-opt-btn:hover {
-          background: var(--bg-card-hover);
-          border-color: var(--primary);
-          transform: translateX(10px);
+
+        .cv-item-btn:hover {
+          background: var(--bg-card);
+          border-color: #0072ce;
+          transform: translateY(-2px);
+          box-shadow: var(--shadow-subtle);
         }
-        .lang-flag {
-          font-size: 2rem;
+
+        .cv-flag {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+          border-radius: 3.5px;
         }
-        .opt-text {
+
+        .cv-item-info {
           flex-grow: 1;
           display: flex;
           flex-direction: column;
         }
-        .lang-name {
+
+        .cv-item-name {
           font-weight: 700;
-          font-size: 1.1rem;
-          font-family: var(--heading);
+          font-size: 0.92rem;
+          color: var(--text-h);
         }
-        .lang-status {
-          font-size: 0.8rem;
-          opacity: 0.6;
-        }
-        .cv-opt-btn svg {
-          opacity: 0.4;
-          transition: opacity 0.3s;
-        }
-        .cv-opt-btn:hover svg {
-          opacity: 1;
-          color: var(--primary);
+
+        .cv-item-status {
+          font-size: 0.74rem;
+          color: var(--text-muted);
         }
       `}</style>
     </section>

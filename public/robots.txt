@@ -1,0 +1,10 @@
+# Robots.txt for Juan Ortega Portfolio
+User-agent: *
+Allow: /
+Disallow: /studio-jo-2026
+Disallow: /admin
+Disallow: /wp-admin
+Disallow: /dashboard
+Disallow: /login
+
+Sitemap: https://juan-ortega.pages.dev/sitemap.xml

@@ -29,6 +29,7 @@ export interface Skill {
 export interface ExperienceItem {
   id?: string;
   company: string;
+  company_logo?: string;
   role_es: string;
   role_en: string;
   role_et: string;
@@ -39,6 +40,28 @@ export interface ExperienceItem {
   end_date: string | null;
   is_current: boolean;
   location: string;
+  employment_type?: string;
+  work_mode?: string;
+  stack?: string[] | string;
+}
+
+export interface EducationItem {
+  id?: string;
+  institution: string;
+  institution_logo?: string;
+  degree_es: string;
+  degree_en: string;
+  degree_et: string;
+  field_of_study?: string;
+  start_date: string;
+  end_date: string | null;
+  is_current: boolean;
+  credential_id?: string;
+  credential_url?: string;
+  description_es?: string;
+  description_en?: string;
+  description_et?: string;
+  stack?: string[] | string;
 }
 
 export interface PageContent {
