@@ -111,10 +111,8 @@ const Projects: React.FC = () => {
     return ['React', 'TypeScript', 'Node.js'];
   };
 
-  // Solo usa defaults si la BD ya cargó y no devolvió nada
-  const projectsToRender = (hasLoaded && dbProjects.length === 0)
-    ? defaultProjects
-    : hasLoaded
+  // Solo muestra proyectos reales de la base de datos
+  const projectsToRender = hasLoaded
     ? dbProjects.map((p, idx) => ({
         id: p.id,
         category_num: `0${idx + 1} — ${(p.category || 'FULL STACK').toUpperCase()}`,
@@ -127,7 +125,7 @@ const Projects: React.FC = () => {
         github_url: p.github_url || '',
         live_url: p.live_url || '',
       }))
-    : []; // aún cargando — no mostrar nada todavía
+    : [];
 
   return (
     <section id="projects" className="projects-root">
@@ -148,9 +146,17 @@ const Projects: React.FC = () => {
           </div>
         </div>
 
-        {/* 3 Column Project Cards Grid Limpias y Elegantes */}
-        <div className="projects-cards-grid">
-          {projectsToRender.map((project, idx) => (
+        {/* Proyectos reales o mensaje de preparación si está vacío */}
+        {hasLoaded && projectsToRender.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: '#f8fafc', borderRadius: '16px', border: '1px dashed #cbd5e1', maxWidth: '640px', margin: '2rem auto 0 auto' }}>
+            <Code2 size={40} style={{ color: '#0072ce', margin: '0 auto 1rem auto', display: 'block' }} />
+            <p style={{ color: '#64748b', fontSize: '1.05rem', fontWeight: 500, margin: 0 }}>
+              {language === 'en' ? 'New projects coming soon. Portfolio currently being updated.' : language === 'et' ? 'Uued projektid lisanduvad peagi.' : 'Nuevos proyectos en preparación. Portafolio en actualización.'}
+            </p>
+          </div>
+        ) : (
+          <div className="projects-cards-grid">
+            {projectsToRender.map((project, idx) => (
             <motion.div
               key={project.id}
               className="project-card"
@@ -223,6 +229,7 @@ const Projects: React.FC = () => {
             </motion.div>
           ))}
         </div>
+        )}
       </div>
 
       <style>{`
