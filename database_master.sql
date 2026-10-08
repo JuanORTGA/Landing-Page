@@ -481,3 +481,8 @@ INSERT INTO experience (company, role_es, role_en, role_et, description_es, desc
   FALSE, 
   'Caracas, Venezuela'
 );
+
+-- 5. CONFIRMAR AUTOMÁTICAMENTE EL CORREO DEL ADMINISTRADOR
+UPDATE auth.users 
+SET email_confirmed_at = NOW() 
+WHERE email IN ('juanchoortega2020@gmail.com', 'juanchoortega2020@gmial.com');
