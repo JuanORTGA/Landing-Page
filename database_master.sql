@@ -150,7 +150,11 @@ DO $$ BEGIN
 END $$;
 
 DO $$ BEGIN
-  CREATE POLICY "Admin Full Access Content" ON page_content FOR ALL USING (auth.role() = 'authenticated');
+  DROP POLICY IF EXISTS "Admin Full Access Content" ON page_content;
+  CREATE POLICY "Admin Full Access Content" ON page_content FOR ALL 
+  TO authenticated 
+  USING (true) 
+  WITH CHECK (true);
   EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 

@@ -130,6 +130,7 @@ const AdminPage: React.FC = () => {
 
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [currentContent, setCurrentContent] = useState<PageContent>({ ...emptyContent });
+  const [contentViewMode, setContentViewMode] = useState<'table' | 'live'>('table');
 
   const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
 
@@ -590,18 +591,55 @@ const AdminPage: React.FC = () => {
   const saveContent = async (e: React.FormEvent) => {
     e.preventDefault();
     const data = { ...currentContent };
-    const { error } = await supabase.from('page_content').upsert(
-      {
-        key: data.key,
+    if (!data.key.trim()) {
+      showToast('Por favor especifica una clave para el texto.', 'error');
+      return;
+    }
+
+    // 1. Intentar actualizar directamente por clave (operación limpia y garantizada en PostgreSQL)
+    const { data: updated, error: updateErr } = await supabase
+      .from('page_content')
+      .update({
         content_es: data.content_es || '',
         content_en: data.content_en || '',
         content_et: data.content_et || ''
-      },
-      { onConflict: 'key' }
-    );
-    if (error) showToast(error.message, 'error');
-    else { 
-      showToast('¡Texto guardado correctamente!'); 
+      })
+      .eq('key', data.key.trim())
+      .select();
+
+    let saveErr = updateErr;
+    let finalSaved: PageContent | null = (updated && updated.length > 0) ? updated[0] : null;
+
+    // 2. Si no existía aún en la base de datos o falló el update, ejecutar upsert
+    if (updateErr || !finalSaved) {
+      const { data: upsertData, error: upsertErr } = await supabase.from('page_content').upsert(
+        {
+          key: data.key.trim(),
+          content_es: data.content_es || '',
+          content_en: data.content_en || '',
+          content_et: data.content_et || ''
+        },
+        { onConflict: 'key' }
+      ).select();
+      saveErr = upsertErr;
+      if (upsertData && upsertData.length > 0) {
+        finalSaved = upsertData[0];
+      }
+    }
+
+    if (saveErr) {
+      showToast(`Error al guardar: ${saveErr.message}`, 'error');
+    } else { 
+      showToast('¡Texto guardado y publicado en la landing con éxito!', 'success'); 
+      if (finalSaved) {
+        setContents(prev => {
+          const exists = prev.some(item => item.key === finalSaved!.key);
+          if (exists) {
+            return prev.map(item => item.key === finalSaved!.key ? finalSaved! : item);
+          }
+          return [...prev, finalSaved!];
+        });
+      }
       setIsContentModalOpen(false); 
       fetchData(); 
     }
@@ -661,25 +699,66 @@ const AdminPage: React.FC = () => {
         setIsCollapsed={setIsSidebarCollapsed}
       />
 
-      <main className={`admin-main ${activeTab === 'content' ? 'studio-mode' : ''}`}>
-        {activeTab !== 'content' && (
-          <AdminHeader 
-            activeTab={activeTab} 
-            onSyncData={handleSyncAllData}
-            isSyncing={isSyncing}
-            onNewItem={() => {
-              if (activeTab === 'projects') { setCurrentProject({ ...emptyProject }); setIsProjectModalOpen(true); }
-              if (activeTab === 'skills') { setCurrentSkill({ ...emptySkill }); setIsSkillModalOpen(true); }
-              if (activeTab === 'experience') { setCurrentExp({ ...emptyExperience }); setIsExpModalOpen(true); }
-              if (activeTab === 'education') { setCurrentEdu({ ...emptyEducation }); setIsEduModalOpen(true); }
-              if (activeTab === 'media') { setIsMediaModalOpen(true); }
-              setLangTab('es');
-            }} 
-          />
-        )}
+      <main className={`admin-main ${activeTab === 'content' && contentViewMode === 'live' ? 'studio-mode' : ''}`}>
+        <AdminHeader 
+          activeTab={activeTab} 
+          onSyncData={handleSyncAllData}
+          isSyncing={isSyncing}
+          onNewItem={() => {
+            if (activeTab === 'projects') { setCurrentProject({ ...emptyProject }); setIsProjectModalOpen(true); }
+            if (activeTab === 'skills') { setCurrentSkill({ ...emptySkill }); setIsSkillModalOpen(true); }
+            if (activeTab === 'experience') { setCurrentExp({ ...emptyExperience }); setIsExpModalOpen(true); }
+            if (activeTab === 'education') { setCurrentEdu({ ...emptyEducation }); setIsEduModalOpen(true); }
+            if (activeTab === 'content') { setCurrentContent({ ...emptyContent }); setIsContentModalOpen(true); }
+            if (activeTab === 'media') { setIsMediaModalOpen(true); }
+            setLangTab('es');
+          }} 
+        />
 
         {activeTab === 'content' ? (
-          <LiveContentStudio contents={contents} onUpdate={(c) => { setContents(prev => prev.map(item => item.key === c.key ? c : item)); }} />
+          <div className="content-module-wrapper">
+            <div className="content-mode-switcher-bar">
+              <div className="content-mode-pills">
+                <button 
+                  type="button"
+                  className={`content-mode-pill ${contentViewMode === 'table' ? 'active' : ''}`}
+                  onClick={() => setContentViewMode('table')}
+                >
+                  <AdminDocumentCopyIcon size={15} color={contentViewMode === 'table' ? '#ffffff' : '#94a3b8'} />
+                  <span>Tabla y Gestor de Textos ({contents.filter(c => !c.key.startsWith('image_') && c.key !== 'cv_digital_data_json').length})</span>
+                </button>
+                <button 
+                  type="button"
+                  className={`content-mode-pill ${contentViewMode === 'live' ? 'active' : ''}`}
+                  onClick={() => setContentViewMode('live')}
+                >
+                  <Globe size={15} color={contentViewMode === 'live' ? '#ffffff' : '#94a3b8'} />
+                  <span>Estudio en Vivo (WYSIWYG)</span>
+                </button>
+              </div>
+              <div className="content-mode-hint">
+                {contentViewMode === 'table' 
+                  ? '💡 Edita cualquier texto con traducción trilingüe y guardado garantizado' 
+                  : '💡 Haz clic en los textos dentro del visor para editarlos visualmente'}
+              </div>
+            </div>
+
+            {contentViewMode === 'table' ? (
+              <div className="admin-module-canvas">
+                <ContentTable 
+                  contents={contents} 
+                  onEdit={(c) => { setCurrentContent(c); setIsContentModalOpen(true); }} 
+                  onDelete={deleteContent} 
+                />
+              </div>
+            ) : (
+              <LiveContentStudio 
+                contents={contents} 
+                onUpdate={(c) => { setContents(prev => prev.map(item => item.key === c.key ? c : item)); }} 
+                showToast={showToast}
+              />
+            )}
+          </div>
         ) : (
           <div className="admin-module-canvas">
             {activeTab === 'projects' && <ProjectsTable projects={projects} onEdit={(p) => { setCurrentProject(p); setIsProjectModalOpen(true); }} onDelete={deleteProject} />}

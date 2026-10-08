@@ -12,12 +12,16 @@ interface PageContent {
 interface LiveContentStudioProps {
   contents: PageContent[];
   onUpdate: (updatedContent: PageContent) => void;
+  showToast?: (message: string, type?: 'success' | 'error' | 'info') => void;
 }
 
 const translateText = async (text: string, langPair: string) => {
   try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 2500);
     const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`;
-    const res = await fetch(url);
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timer);
     const data = await res.json();
     return data?.responseData?.translatedText || text;
   } catch {
@@ -25,7 +29,7 @@ const translateText = async (text: string, langPair: string) => {
   }
 };
 
-const LiveContentStudio: React.FC<LiveContentStudioProps> = ({ contents: _contents, onUpdate }) => {
+const LiveContentStudio: React.FC<LiveContentStudioProps> = ({ contents: _contents, onUpdate, showToast }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [deviceSize, setDeviceSize] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [pendingChanges, setPendingChanges] = useState<Record<string, string>>({});
@@ -47,32 +51,60 @@ const LiveContentStudio: React.FC<LiveContentStudioProps> = ({ contents: _conten
     if (keys.length === 0) return;
     
     setIsSaving(true);
+    let successCount = 0;
+    const errors: string[] = [];
+
     try {
       for (const key of keys) {
         const esText = pendingChanges[key];
         
-        // Auto-translate to EN and ET
-        const enText = await translateText(esText, 'es|en');
-        const etText = await translateText(esText, 'es|et');
-
-        const { data, error } = await supabase
-          .from('page_content')
-          .upsert({
-            key,
-            content_es: esText,
-            content_en: enText,
-            content_et: etText
-          }, { onConflict: 'key' })
-          .select()
-          .single();
-
-        if (error) {
-          console.error("Supabase upsert error:", error);
+        // Auto-traducción a EN y ET con fallback a texto en español si falla
+        let enText = esText;
+        let etText = esText;
+        try {
+          enText = await translateText(esText, 'es|en');
+          etText = await translateText(esText, 'es|et');
+        } catch {
+          // Fallback silencioso
         }
 
-        if (!error && data) {
-          onUpdate(data);
-          // Actualizar el iframe
+        // 1. Intentar actualizar directamente por clave (muy seguro con PostgreSQL RLS)
+        const { data: updatedData, error: updateError } = await supabase
+          .from('page_content')
+          .update({
+            content_es: esText,
+            content_en: enText || esText,
+            content_et: etText || esText
+          })
+          .eq('key', key)
+          .select();
+
+        let finalSaved: PageContent | null = (updatedData && updatedData.length > 0) ? updatedData[0] : null;
+
+        // 2. Si no existía aún en la base de datos, ejecutar upsert
+        if (updateError || !finalSaved) {
+          const { data: upsertData, error: upsertError } = await supabase
+            .from('page_content')
+            .upsert({
+              key,
+              content_es: esText,
+              content_en: enText || esText,
+              content_et: etText || esText
+            }, { onConflict: 'key' })
+            .select();
+
+          if (upsertError) {
+            console.error(`Error guardando ${key}:`, upsertError);
+            errors.push(`${key}: ${upsertError.message}`);
+          } else if (upsertData && upsertData.length > 0) {
+            finalSaved = upsertData[0];
+          }
+        }
+
+        if (finalSaved) {
+          successCount++;
+          onUpdate(finalSaved);
+          // Actualizar el iframe en vivo
           if (iframeRef.current && iframeRef.current.contentWindow) {
             iframeRef.current.contentWindow.postMessage({
               type: 'UPDATE_TRANSLATION',
@@ -82,9 +114,22 @@ const LiveContentStudio: React.FC<LiveContentStudioProps> = ({ contents: _conten
           }
         }
       }
-      setPendingChanges({});
-    } catch (err) {
+
+      if (successCount > 0) {
+        setPendingChanges({});
+        if (showToast) {
+          showToast(`¡${successCount} texto(s) guardado(s) y publicados con éxito en la landing!`, 'success');
+        }
+      }
+
+      if (errors.length > 0 && showToast) {
+        showToast(`Error al guardar: ${errors.join(', ')}`, 'error');
+      }
+    } catch (err: any) {
       console.error("Error guardando:", err);
+      if (showToast) {
+        showToast(err.message || 'Error al guardar los textos', 'error');
+      }
     } finally {
       setIsSaving(false);
     }

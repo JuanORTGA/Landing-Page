@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 
 interface EditableTextProps {
   tKey: string;
@@ -6,13 +6,22 @@ interface EditableTextProps {
 }
 
 const EditableText: React.FC<EditableTextProps> = ({ tKey, initialText }) => {
+  const spanRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (spanRef.current && spanRef.current.innerText !== initialText) {
+      spanRef.current.innerText = initialText;
+    }
+  }, [initialText]);
+
   const handleBlur = (e: React.FocusEvent<HTMLElement>) => {
-    const newText = e.target.innerText;
+    const newText = e.currentTarget.innerText;
     window.parent.postMessage({ type: 'LIVE_UPDATE', key: tKey, value: newText }, '*');
   };
 
   return (
     <span
+      ref={spanRef}
       contentEditable
       suppressContentEditableWarning
       onBlur={handleBlur}

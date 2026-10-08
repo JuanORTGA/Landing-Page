@@ -55,6 +55,24 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     };
 
     fetchContent();
+
+    const handleFocus = () => {
+      fetchContent();
+    };
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetchContent();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, []);
 
   useEffect(() => {
