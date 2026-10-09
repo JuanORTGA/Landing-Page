@@ -183,11 +183,6 @@ const Projects: React.FC = () => {
                       <Code2 size={40} className="placeholder-svg" />
                       <span>{project.title}</span>
                     </div>
-
-                    {/* Badge 3D flotante sobre la imagen */}
-                    <div className="project-floating-category-badge">
-                      <span>{project.category_num}</span>
-                    </div>
                   </div>
 
                   {/* Card Info Body */}
@@ -278,15 +273,18 @@ const Projects: React.FC = () => {
         /* 3-Cols Grid con perspectiva para 3D */
         .projects-cards-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 3rem 2rem;
-          perspective: 1400px;
+          grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+          gap: 4.5rem 3rem;
+          perspective: 1600px;
+          perspective-origin: center center;
+          padding: 1.5rem 1rem 3.5rem 1rem;
         }
 
         @media (max-width: 1024px) {
           .projects-cards-grid {
             grid-template-columns: 1fr;
-            gap: 3.5rem;
+            gap: 4rem;
+            padding: 1rem 0;
           }
           .projects-header-grid {
             grid-template-columns: 1fr;
@@ -300,10 +298,11 @@ const Projects: React.FC = () => {
           display: flex;
           flex-direction: column;
           align-items: center;
-          padding-bottom: 1.75rem;
+          perspective: 1600px;
+          padding-bottom: 2.5rem;
         }
 
-        /* Tarjeta 3D Flotante */
+        /* Tarjeta 3D Flotante con rotación de lado auténtica y volumen físico */
         .project-card-3d {
           position: relative;
           z-index: 2;
@@ -314,83 +313,93 @@ const Projects: React.FC = () => {
           overflow: hidden;
           background: var(--bg-card);
           border: 1px solid var(--border);
-          box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.08), 0 0 1px 1px rgba(255, 255, 255, 0.6) inset;
+          box-shadow: 
+            -14px 22px 42px -10px rgba(0, 0, 0, 0.12),
+            0 0 1px 1px rgba(255, 255, 255, 0.7) inset;
           transform-style: preserve-3d;
-          transform: translateY(0px) rotateX(1deg);
-          animation: floatLevitate 5s ease-in-out infinite alternate;
-          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+          transform: perspective(1600px) rotateY(-9deg) rotateX(6deg) rotateZ(-1.2deg) translateY(0px);
+          animation: floatLevitate3D 5.5s ease-in-out infinite alternate;
+          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+          transform-origin: center bottom;
         }
 
-        /* Efecto Hover 3D con mayor elevación e inclinación */
+        /* Modo oscuro para tarjeta 3D */
+        body.dark-mode .project-card-3d {
+          box-shadow: 
+            -18px 26px 50px -12px rgba(0, 0, 0, 0.6),
+            0 0 1px 1px rgba(255, 255, 255, 0.08) inset;
+        }
+
+        /* Hover interactivo 3D: La tarjeta se eleva hacia adelante y se alinea hacia el espectador */
         .project-card-3d-stage:hover .project-card-3d {
           animation-play-state: paused;
-          transform: translateY(-16px) rotateX(4deg) scale(1.025);
+          transform: perspective(1600px) rotateY(-2deg) rotateX(2deg) rotateZ(0deg) translateY(-22px) scale(1.03);
           box-shadow: 
-            0 25px 50px -12px rgba(0, 0, 0, 0.16),
-            0 0 0 1px rgba(0, 114, 206, 0.35),
-            0 12px 28px -6px rgba(0, 114, 206, 0.18);
-          border-color: rgba(0, 114, 206, 0.4);
+            0 35px 70px -15px rgba(0, 0, 0, 0.2),
+            0 0 0 1px rgba(0, 114, 206, 0.4),
+            0 14px 35px -6px rgba(0, 114, 206, 0.22);
+          border-color: rgba(0, 114, 206, 0.45);
         }
 
-        /* Sombra de Sobre Piso (Floor Contact Shadow) */
+        /* Sombra de Sobre Piso (Ground Floor Contact Shadow sincronizada con la inclinación) */
         .project-floor-shadow {
           position: absolute;
-          bottom: 0.5rem;
+          bottom: 0.75rem;
           left: 50%;
-          transform: translateX(-50%) scale(1);
-          width: 82%;
-          height: 18px;
+          transform: translateX(-50%) rotateZ(-1.2deg) scale(1);
+          width: 86%;
+          height: 22px;
           border-radius: 50%;
-          background: radial-gradient(ellipse at center, rgba(15, 23, 42, 0.35) 0%, rgba(15, 23, 42, 0.12) 50%, transparent 75%);
-          filter: blur(6px);
+          background: radial-gradient(ellipse at center, rgba(15, 23, 42, 0.42) 0%, rgba(15, 23, 42, 0.16) 45%, transparent 75%);
+          filter: blur(8px);
           pointer-events: none;
           z-index: 1;
-          animation: shadowPulse 5s ease-in-out infinite alternate;
-          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          animation: shadowPulse3D 5.5s ease-in-out infinite alternate;
+          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Modo Oscuro: Sombra de piso con sutil aura azul */
+        /* Modo Oscuro: Sombra de piso con sutil aura azul estonio */
         body.dark-mode .project-floor-shadow {
-          background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.8) 0%, rgba(0, 114, 206, 0.25) 45%, transparent 75%);
-          filter: blur(8px);
+          background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.88) 0%, rgba(0, 114, 206, 0.28) 45%, transparent 75%);
+          filter: blur(10px);
         }
 
-        /* Al hacer hover la tarjeta sube, la sombra se suaviza y encoge por física de luz */
+        /* Al hacer hover la tarjeta flota más alto, la sombra se suaviza y encoge por física de luz */
         .project-card-3d-stage:hover .project-floor-shadow {
           animation-play-state: paused;
-          transform: translateX(-50%) scale(0.78);
-          opacity: 0.5;
-          filter: blur(9px);
+          transform: translateX(-50%) scale(0.74);
+          opacity: 0.45;
+          filter: blur(12px);
         }
 
-        /* Animaciones continuas de levitación física */
-        @keyframes floatLevitate {
+        /* Animaciones continuas de levitación 3D física */
+        @keyframes floatLevitate3D {
           0% {
-            transform: translateY(0px) rotateX(1deg);
+            transform: perspective(1600px) rotateY(-9deg) rotateX(6deg) rotateZ(-1.2deg) translateY(0px);
           }
           50% {
-            transform: translateY(-9px) rotateX(2.5deg);
+            transform: perspective(1600px) rotateY(-6deg) rotateX(3.5deg) rotateZ(-0.6deg) translateY(-14px);
           }
           100% {
-            transform: translateY(0px) rotateX(1deg);
+            transform: perspective(1600px) rotateY(-9deg) rotateX(6deg) rotateZ(-1.2deg) translateY(0px);
           }
         }
 
-        @keyframes shadowPulse {
+        @keyframes shadowPulse3D {
           0% {
-            transform: translateX(-50%) scale(1);
-            opacity: 0.85;
-            filter: blur(6px);
-          }
-          50% {
-            transform: translateX(-50%) scale(0.85);
-            opacity: 0.55;
+            transform: translateX(-50%) rotateZ(-1.2deg) scale(1);
+            opacity: 0.9;
             filter: blur(8px);
           }
+          50% {
+            transform: translateX(-50%) rotateZ(-1.2deg) scale(0.82);
+            opacity: 0.55;
+            filter: blur(12px);
+          }
           100% {
-            transform: translateX(-50%) scale(1);
-            opacity: 0.85;
-            filter: blur(6px);
+            transform: translateX(-50%) rotateZ(-1.2deg) scale(1);
+            opacity: 0.9;
+            filter: blur(8px);
           }
         }
 
@@ -439,26 +448,6 @@ const Projects: React.FC = () => {
         .placeholder-svg {
           opacity: 0.35;
           color: #0072ce;
-        }
-
-        .project-floating-category-badge {
-          position: absolute;
-          top: 0.85rem;
-          right: 0.85rem;
-          z-index: 2;
-          background: rgba(15, 23, 42, 0.78);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
-          border: 1px solid rgba(255, 255, 255, 0.18);
-          color: #ffffff;
-          padding: 0.3rem 0.7rem;
-          border-radius: 9999px;
-          font-family: var(--font-mono);
-          font-size: 0.66rem;
-          font-weight: 700;
-          letter-spacing: 0.05em;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-          pointer-events: none;
         }
 
         /* Card Body */
