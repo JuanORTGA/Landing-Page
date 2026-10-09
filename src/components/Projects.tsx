@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { supabase } from '../services/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { motion } from 'framer-motion';
 import { ExternalLink, Github, Code2 } from 'lucide-react';
 
@@ -9,24 +10,54 @@ const Projects: React.FC = () => {
   const [dbProjects, setDbProjects] = useState<any[]>([]);
   const [hasLoaded, setHasLoaded] = useState(false);
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const { data, error } = await supabase
+  const fetchProjects = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        setDbProjects(data);
+      } else if (error || !data || data.length === 0) {
+        // En caso de sesión previa caducada en localStorage del navegador, reintento limpio
+        const anonClient = createClient(
+          import.meta.env.VITE_SUPABASE_URL || 'https://rdkqxpgsvwqljqyffrjw.supabase.co',
+          import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJka3F4cGdzdndxbGpxeWZmcmp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2Njc4NzQsImV4cCI6MjA4NDI0Mzg3NH0.pQpMTui1u1c9QgUiuS503egWnT_wiQTNZTOS8zOw-lg',
+          { auth: { persistSession: false, autoRefreshToken: false } }
+        );
+        const { data: retryData } = await anonClient
           .from('projects')
           .select('*')
           .order('created_at', { ascending: false });
-
-        if (!error && data) {
+        if (retryData && retryData.length > 0) {
+          setDbProjects(retryData);
+        } else if (data) {
           setDbProjects(data);
         }
-      } catch (err) {
-        console.error('Error fetching projects:', err);
-      } finally {
-        setHasLoaded(true);
       }
-    };
+    } catch (err) {
+      console.error('Error fetching projects:', err);
+    } finally {
+      setHasLoaded(true);
+    }
+  };
+
+  useEffect(() => {
     fetchProjects();
+
+    // Auto-sincronización instantánea al cambiar de pestaña desde el panel a la landing
+    const handleFocus = () => {
+      fetchProjects();
+    };
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') fetchProjects();
+    });
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const getT = (key: string, fallback: string) => {
