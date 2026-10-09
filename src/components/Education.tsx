@@ -6,45 +6,6 @@ import { ExternalLink, Gem } from 'lucide-react';
 import { AcademicDegreeIcon } from './icons/FlaticonVectors';
 import type { EducationItem } from '../types/database';
 
-const defaultEducation: EducationItem[] = [
-  {
-    id: 'edu-1',
-    institution: 'Universidad / Instituto de Tecnología',
-    institution_logo: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=200&q=80',
-    degree_es: 'Ingeniería de Sistemas / Informática',
-    degree_en: 'Computer Science / Systems Engineering',
-    degree_et: 'Arvutisüsteemide ja tarkvaratehnika',
-    field_of_study: 'Ciencias de la Computación & Software',
-    start_date: '2020',
-    end_date: '2024',
-    is_current: false,
-    credential_id: 'UNI-CS-2024-JO',
-    credential_url: '',
-    description_es: '- Fundamentos de arquitectura de software, estructuras de datos y algoritmos avanzados.\n- Desarrollo de sistemas distribuidos y bases de datos relacionales.\n- Enfoque en ingeniería de software, seguridad informática y metodologías ágiles.',
-    description_en: '- Software architecture fundamentals, data structures, and advanced algorithms.\n- Distributed systems engineering and relational database design.\n- Focus on software engineering, cybersecurity, and agile development.',
-    description_et: '- Tarkvaraarhitektuuri alused, andmestruktuurid ja täiustatud algoritmid.\n- Jaotatud süsteemide arendus ja relatsiooniliste andmebaaside optimeerimine.\n- Keskendumine tarkvaratehnikale ja küberturvalisusele.',
-    stack: ['Python', 'SQL', 'Data Structures', 'Software Architecture', 'Algorithms', 'Git']
-  },
-  {
-    id: 'edu-2',
-    institution: 'Certificación Profesional & Bootcamps Tech',
-    institution_logo: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=200&q=80',
-    degree_es: 'Certificación Profesional Full-Stack Web Development',
-    degree_en: 'Professional Full-Stack Web Development Certification',
-    degree_et: 'Full-Stack Veebiarenduse Professionaalne Sertifikaat',
-    field_of_study: 'Desarrollo Web Moderno & Cloud',
-    start_date: '2024',
-    end_date: '2024',
-    is_current: false,
-    credential_id: 'CERT-FS-9982-DEV',
-    credential_url: '',
-    description_es: '- Especialización práctica en desarrollo backend con Django REST Framework y frontend con React & TypeScript.\n- Implementación de pipelines CI/CD, contenedorización con Docker e integración de APIs RESTful seguras.',
-    description_en: '- Hands-on specialization in Django REST Framework backend and React & TypeScript frontend.\n- CI/CD automation, Docker containerization, and robust RESTful API integration.',
-    description_et: '- Praktiline spetsialiseerumine Django REST Framework backendis ja React & TypeScript frontendis.\n- CI/CD protsessid, Docker konteinerid ja turvalised RESTful API-d.',
-    stack: ['Django', 'React', 'TypeScript', 'Docker', 'PostgreSQL', 'REST APIs']
-  }
-];
-
 const parseStack = (rawStack: any): string[] => {
   if (Array.isArray(rawStack)) return rawStack;
   if (typeof rawStack === 'string') {
@@ -63,6 +24,7 @@ const parseStack = (rawStack: any): string[] => {
 const Education: React.FC = () => {
   const { language, t } = useLanguage();
   const [dbEducation, setDbEducation] = useState<EducationItem[]>([]);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [expandedSkills, setExpandedSkills] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -73,11 +35,15 @@ const Education: React.FC = () => {
           .select('*')
           .order('start_date', { ascending: false });
 
-        if (!error && data && data.length > 0) {
+        if (!error && data) {
           setDbEducation(data as EducationItem[]);
+        } else if (!error) {
+          setDbEducation([]);
         }
       } catch (err) {
         console.error('Error fetching education:', err);
+      } finally {
+        setHasLoaded(true);
       }
     };
     fetchEducation();
@@ -119,8 +85,6 @@ const Education: React.FC = () => {
     return fallbacks[key]?.[language as string] || fallbacks[key]?.['es'] || key;
   };
 
-  const listToRender = (dbEducation && dbEducation.length > 0) ? dbEducation : defaultEducation;
-
   const toggleSkills = (id: string) => {
     setExpandedSkills(prev => ({ ...prev, [id]: !prev[id] }));
   };
@@ -149,8 +113,16 @@ const Education: React.FC = () => {
 
           </motion.div>
 
-          <div className="linkedin-experience-list">
-            {listToRender.map((edu, idx) => {
+          {hasLoaded && dbEducation.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: '#f8fafc', borderRadius: '16px', border: '1px dashed #cbd5e1', maxWidth: '640px', margin: '2rem auto 0 auto' }}>
+              <AcademicDegreeIcon size={40} color="#0072ce" />
+              <p style={{ color: '#64748b', fontSize: '1rem', fontWeight: 500, margin: '1rem 0 0 0' }}>
+                {language === 'en' ? 'Education and certifications currently being configured from the admin panel.' : language === 'et' ? 'Haridus ja sertifikaadid seadistamisel administraatori paneelist.' : 'Educación y certificaciones en configuración desde el panel de administrador.'}
+              </p>
+            </div>
+          ) : (
+            <div className="linkedin-experience-list">
+              {dbEducation.map((edu, idx) => {
               const degree = (language === 'en' ? edu.degree_en : language === 'et' ? edu.degree_et : edu.degree_es) || edu.degree_es;
               const desc = (language === 'en' ? edu.description_en : language === 'et' ? edu.description_et : edu.description_es) || edu.description_es || '';
               const isCurrent = edu.is_current || !edu.end_date || edu.end_date.toLowerCase() === 'present' || edu.end_date.toLowerCase() === 'presente';
@@ -270,6 +242,7 @@ const Education: React.FC = () => {
               );
             })}
           </div>
+        )}
         </div>
       </div>
 

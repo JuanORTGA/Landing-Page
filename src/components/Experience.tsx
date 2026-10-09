@@ -6,45 +6,6 @@ import { Gem } from 'lucide-react';
 import { EnterpriseWorkIcon } from './icons/FlaticonVectors';
 import type { ExperienceItem } from '../types/database';
 
-const defaultExperiences: ExperienceItem[] = [
-  {
-    id: 'exp-1',
-    company: 'Instituto Nacional de Tierras (INTI)',
-    company_logo: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?auto=format&fit=crop&w=200&q=80',
-    role_es: 'Desarrollador Web Full-Stack',
-    role_en: 'Full-Stack Web Developer',
-    role_et: 'Full-Stack veebiarendaja',
-    employment_type: 'Jornada completa',
-    work_mode: 'Presencial',
-    start_date: 'ene. 2025',
-    end_date: null,
-    is_current: true,
-    location: 'Caracas, Venezuela',
-    description_es: '- Construcción y mantenimiento de aplicaciones web internas de alta concurrencia utilizando Django y React.\n- Optimización de consultas SQL en PostgreSQL reduciendo tiempos de respuesta en un 20%.\n- Implementación de arquitecturas seguras y control de acceso.',
-    description_en: '- Built and maintained high-concurrency internal web applications using Django and React.\n- Optimized SQL queries in PostgreSQL reducing response latency by 20%.\n- Implemented secure architectures and role-based access control.',
-    description_et: '- Suure koormusega sisemiste veebirakenduste arendamine ja hooldus Django ja Reacti baasil.\n- SQL päringute optimeerimine PostgreSQLis, vähendades laadimisaegu 20%.\n- Turvaliste arhitektuuride ja juurdepääsukontrolli juurutamine.',
-    stack: ['Django', 'React', 'PostgreSQL', 'Python', 'REST APIs', 'SQL Tuning']
-  },
-  {
-    id: 'exp-2',
-    company: 'Ministerio de Salud (Venezuela)',
-    company_logo: 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=200&q=80',
-    role_es: 'Desarrollador Backend',
-    role_en: 'Backend Developer',
-    role_et: 'Backend-arendaja',
-    employment_type: 'Jornada completa',
-    work_mode: 'En remoto',
-    start_date: 'ene. 2024',
-    end_date: 'dic. 2024',
-    is_current: false,
-    location: 'Caracas, Venezuela',
-    description_es: '- Diseño e implementación de un prototipo de mensajería interna institucional segura con Python y Django REST Framework.\n- Cifrado de datos sensible y control de acceso basado en roles (RBAC).\n- Modelado y optimización de base de datos MySQL.',
-    description_en: '- Designed and built a secure institutional internal messaging system prototype using Python and Django REST Framework.\n- Enforced data encryption and Role-Based Access Control (RBAC).\n- MySQL schema modeling and performance optimization.',
-    description_et: '- Turvalise asutusesisese sõnumsüsteemi prototüübi projekteerimine ja loomine Pythoni ja Django REST Frameworkiga.\n- Tundlike andmete krüpteerimine ja rollipõhine juurdepääsukontroll (RBAC).\n- MySQL andmebaasi modelleerimine ja optimeerimine.',
-    stack: ['Python', 'Django REST', 'MySQL', 'RBAC', 'Data Encryption']
-  }
-];
-
 const parseStack = (rawStack: any): string[] => {
   if (Array.isArray(rawStack)) return rawStack;
   if (typeof rawStack === 'string') {
@@ -63,6 +24,7 @@ const parseStack = (rawStack: any): string[] => {
 const Experience: React.FC = () => {
   const { language, t } = useLanguage();
   const [dbExperiences, setDbExperiences] = useState<ExperienceItem[]>([]);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [expandedSkills, setExpandedSkills] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -73,11 +35,15 @@ const Experience: React.FC = () => {
           .select('*')
           .order('start_date', { ascending: false });
 
-        if (!error && data && data.length > 0) {
+        if (!error && data) {
           setDbExperiences(data as ExperienceItem[]);
+        } else if (!error) {
+          setDbExperiences([]);
         }
       } catch (err) {
         console.error('Error fetching experience:', err);
+      } finally {
+        setHasLoaded(true);
       }
     };
     fetchExperience();
@@ -134,8 +100,6 @@ const Experience: React.FC = () => {
     return fallbacks[key]?.[language as string] || fallbacks[key]?.['es'] || key;
   };
 
-  const listToRender = (dbExperiences && dbExperiences.length > 0) ? dbExperiences : defaultExperiences;
-
   const toggleSkills = (id: string) => {
     setExpandedSkills(prev => ({ ...prev, [id]: !prev[id] }));
   };
@@ -163,8 +127,16 @@ const Experience: React.FC = () => {
 
           </motion.div>
 
-          <div className="linkedin-experience-list">
-            {listToRender.map((exp, idx) => {
+          {hasLoaded && dbExperiences.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: '#f8fafc', borderRadius: '16px', border: '1px dashed #cbd5e1', maxWidth: '640px', margin: '2rem auto 0 auto' }}>
+              <EnterpriseWorkIcon size={40} color="#0072ce" />
+              <p style={{ color: '#64748b', fontSize: '1rem', fontWeight: 500, margin: '1rem 0 0 0' }}>
+                {language === 'en' ? 'Professional trajectory currently being configured from the admin panel.' : language === 'et' ? 'Töökogemus seadistamisel administraatori paneelist.' : 'Trayectoria laboral en configuración desde el panel de administrador.'}
+              </p>
+            </div>
+          ) : (
+            <div className="linkedin-experience-list">
+              {dbExperiences.map((exp, idx) => {
               const role = (language === 'en' ? exp.role_en : language === 'et' ? exp.role_et : exp.role_es) || exp.role_es;
               const desc = (language === 'en' ? exp.description_en : language === 'et' ? exp.description_et : exp.description_es) || exp.description_es;
               const isCurrent = exp.is_current || !exp.end_date || exp.end_date.toLowerCase() === 'present' || exp.end_date.toLowerCase() === 'presente';
@@ -267,6 +239,7 @@ const Experience: React.FC = () => {
               );
             })}
           </div>
+        )}
         </div>
       </div>
 

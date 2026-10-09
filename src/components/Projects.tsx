@@ -57,45 +57,6 @@ const Projects: React.FC = () => {
     return fallbacks[key]?.[language as string] || fallbacks[key]?.['es'] || key;
   };
 
-  const defaultProjects = [
-    {
-      id: 'nordic-metrics',
-      category_num: '01 — WEB APP',
-      title: 'Nordic Metrics',
-      desc_es: 'Dashboard web para visualizar datos operativos y facilitar decisiones rápidas en equipos digitales.',
-      desc_en: 'Web dashboard to visualize operational data and streamline fast decisions in digital teams.',
-      desc_et: 'Veebipõhine juhtpaneel operatiivandmete visualiseerimiseks ja kiirete otsuste toetamiseks.',
-      stack: ['React 18', 'TypeScript', 'Tailwind', 'Chart.js'],
-      image_url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80',
-      github_url: 'https://github.com/JuanORTGA',
-      live_url: 'https://github.com/JuanORTGA',
-    },
-    {
-      id: 'keeleleek',
-      category_num: '02 — EDTECH APP',
-      title: 'KeeleLeek',
-      desc_es: 'Plataforma interactiva para aprender estonio con ejercicios de audio, vocabulario y gamificación.',
-      desc_en: 'Interactive platform to learn Estonian with audio drills, vocabulary, and gamification.',
-      desc_et: 'Interaktiivne platvorm eesti keele õppimiseks audioharjutuste, sõnavara ja mängulisusega.',
-      stack: ['React', 'Node.js', 'PostgreSQL', 'Tailwind'],
-      image_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80',
-      github_url: 'https://github.com/JuanORTGA',
-      live_url: 'https://github.com/JuanORTGA',
-    },
-    {
-      id: 'task-flow',
-      category_num: '03 — SAAS TOOL',
-      title: 'TaskFlow Architecture',
-      desc_es: 'Sistema de gestión de tareas en tiempo real con sincronización de estado, autenticación y base de datos relacional.',
-      desc_en: 'Real-time task management system with state sync, auth, and relational database.',
-      desc_et: 'Reaalajas ülesannete haldussüsteem oleku sünkroonimise, autentimise ja relatsioonilise andmebaasiga.',
-      stack: ['TypeScript', 'Supabase', 'REST API', 'Framer'],
-      image_url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
-      github_url: 'https://github.com/JuanORTGA',
-      live_url: 'https://github.com/JuanORTGA',
-    }
-  ];
-
   const parseStack = (rawStack: any): string[] => {
     if (Array.isArray(rawStack)) return rawStack;
     if (typeof rawStack === 'string') {

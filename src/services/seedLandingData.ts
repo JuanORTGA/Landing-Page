@@ -74,88 +74,6 @@ export const realLandingSeedData = {
     { key: 'contact_form_email', content_es: 'Tu Correo', content_en: 'Your Email', content_et: 'Sinu e-post' },
     { key: 'contact_form_msg', content_es: 'Mensaje', content_en: 'Message', content_et: 'Sõnum' },
     { key: 'contact_send_btn', content_es: 'Enviar Mensaje', content_en: 'Send Message', content_et: 'Saada sõnum' },
-  ],
-
-  projects: [
-    {
-      title_es: 'Nordic Metrics',
-      title_en: 'Nordic Metrics',
-      title_et: 'Nordic Metrics',
-      description_short_es: 'Dashboard web para visualizar datos operativos y facilitar decisiones rápidas en equipos digitales.',
-      description_short_en: 'Web dashboard to visualize operational data and streamline fast decisions in digital teams.',
-      description_short_et: 'Veebipõhine juhtpaneel operatiivandmete visualiseerimiseks ja kiirete otsuste toetamiseks.',
-      github_url: 'https://github.com/JuanORTGA',
-      live_url: 'https://github.com/JuanORTGA',
-      stack: ['React 18', 'TypeScript', 'Tailwind', 'Chart.js'],
-      category: 'WEB APP',
-      image_url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      title_es: 'KeeleLeek',
-      title_en: 'KeeleLeek',
-      title_et: 'KeeleLeek',
-      description_short_es: 'Plataforma interactiva para aprender estonio con ejercicios de audio, vocabulario y gamificación.',
-      description_short_en: 'Interactive platform to learn Estonian with audio drills, vocabulary, and gamification.',
-      description_short_et: 'Interaktiivne platvorm eesti keele õppimiseks audioharjutuste, sõnavara ja mängulisusega.',
-      github_url: 'https://github.com/JuanORTGA',
-      live_url: 'https://github.com/JuanORTGA',
-      stack: ['React', 'Node.js', 'PostgreSQL', 'Tailwind'],
-      category: 'EDTECH APP',
-      image_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      title_es: 'TaskFlow Architecture',
-      title_en: 'TaskFlow Architecture',
-      title_et: 'TaskFlow Architecture',
-      description_short_es: 'Sistema de gestión de tareas en tiempo real con sincronización de estado, autenticación y base de datos relacional.',
-      description_short_en: 'Real-time task management system with state sync, auth, and relational database.',
-      description_short_et: 'Reaalajas ülesannete haldussüsteem oleku sünkroonimise, autentimise ja relatsioonilise andmebaasiga.',
-      github_url: 'https://github.com/JuanORTGA',
-      live_url: 'https://github.com/JuanORTGA',
-      stack: ['TypeScript', 'Supabase', 'REST API', 'Framer'],
-      category: 'SAAS TOOL',
-      image_url: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80'
-    }
-  ],
-
-  skills: [
-    { name: 'Python', icon: 'python', category: 'Languages & Core', level: 95, order: 1 },
-    { name: 'Django & DRF', icon: 'django', category: 'Backend Frameworks', level: 92, order: 2 },
-    { name: 'React 18 & Next.js', icon: 'react', category: 'Frontend & UI', level: 92, order: 3 },
-    { name: 'TypeScript', icon: 'typescript', category: 'Languages & Core', level: 90, order: 4 },
-    { name: 'YOLO (Ultralytics)', icon: 'yolo', category: 'Computer Vision & AI', level: 88, order: 5 },
-    { name: 'Roboflow', icon: 'roboflow', category: 'Computer Vision & AI', level: 86, order: 6 },
-    { name: 'PostgreSQL & Supabase', icon: 'postgresql', category: 'Databases & SQL', level: 88, order: 7 },
-    { name: 'Docker & DevOps', icon: 'docker', category: 'DevOps & Containers', level: 84, order: 8 }
-  ],
-
-  experience: [
-    {
-      company: 'Instituto Nacional de Tierras (INTI)',
-      role_es: 'Desarrollador Web Full-Stack',
-      role_en: 'Full-Stack Web Developer',
-      role_et: 'Full-Stack veebiarendaja',
-      description_es: 'Construcción y mantenimiento de aplicaciones web internas de alta concurrencia utilizando Django en el backend y React en el frontend. Optimización de consultas SQL en PostgreSQL reduciendo tiempos de respuesta en un 20%.',
-      description_en: 'Building and maintaining high-concurrency internal web applications using Django backend and React frontend. Optimized PostgreSQL queries reducing query latency by 20%.',
-      description_et: 'Sisemiste suure koormusega veebirakenduste arendamine ja hooldus kasutades Django backendis ja React frontendis. PostgreSQL päringute optimeerimine, vähendades laadimisaegu 20%.',
-      start_date: '2025',
-      end_date: null,
-      is_current: true,
-      location: 'Caracas, Venezuela'
-    },
-    {
-      company: 'Ministerio de Salud (Venezuela)',
-      role_es: 'Desarrollador Backend',
-      role_en: 'Backend Developer',
-      role_et: 'Backend-arendaja',
-      description_es: 'Diseño e implementación de un prototipo de mensajería interna institucional segura utilizando Python, Django REST Framework y MySQL. Implementación de cifrado de datos y control de acceso basado en roles (RBAC).',
-      description_en: 'Designed and implemented an institutional secure internal messaging system prototype using Python, Django REST Framework, and MySQL. Enforced data encryption and Role-Based Access Control (RBAC).',
-      description_et: 'Turvalise asutusesisese sõnumisüsteemi prototüübi projekteerimine ja juurutamine kasutades Pythonit, Django REST Frameworki ja MySQLi koos andmete krüpteerimise ja rollipõhise juurdepääsukontrolliga.',
-      start_date: '2024',
-      end_date: '2024',
-      is_current: false,
-      location: 'Caracas, Venezuela'
-    }
   ]
 };
 
@@ -169,32 +87,16 @@ export const syncAllLandingDataToSupabase = async () => {
   };
 
   try {
-    // 1. Sincronizar page_content
+    // Sincronizar page_content preservando cualquier texto que el usuario ya haya editado en el panel
+    const { data: existingRows } = await supabase.from('page_content').select('key');
+    const existingSet = new Set((existingRows || []).map((r: any) => r.key));
+
     for (const item of realLandingSeedData.page_content) {
-      const { error } = await supabase.from('page_content').upsert(item, { onConflict: 'key' });
-      if (error) results.errors.push(`Content (${item.key}): ${error.message}`);
-      else results.content++;
-    }
-
-    // 2. Sincronizar projects (si no existen o actualizar)
-    for (const proj of realLandingSeedData.projects) {
-      const { error } = await supabase.from('projects').insert([proj]);
-      if (error) results.errors.push(`Project (${proj.title_es}): ${error.message}`);
-      else results.projects++;
-    }
-
-    // 3. Sincronizar skills
-    for (const skill of realLandingSeedData.skills) {
-      const { error } = await supabase.from('skills').insert([skill]);
-      if (error) results.errors.push(`Skill (${skill.name}): ${error.message}`);
-      else results.skills++;
-    }
-
-    // 4. Sincronizar experience
-    for (const exp of realLandingSeedData.experience) {
-      const { error } = await supabase.from('experience').insert([exp]);
-      if (error) results.errors.push(`Experience (${exp.company}): ${error.message}`);
-      else results.experience++;
+      if (!existingSet.has(item.key)) {
+        const { error } = await supabase.from('page_content').insert([item]);
+        if (error) results.errors.push(`Content (${item.key}): ${error.message}`);
+        else results.content++;
+      }
     }
   } catch (err: any) {
     results.errors.push(err.message || 'Error desconocido al sincronizar');
@@ -202,3 +104,4 @@ export const syncAllLandingDataToSupabase = async () => {
 
   return results;
 };
+
