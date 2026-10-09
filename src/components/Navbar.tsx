@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage, type Language } from '../context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sun, Moon, ChevronRight, Send, User, Briefcase, FolderGit2, Mail } from 'lucide-react';
 import joeLogo from '../assets/joe-technology-logo-transparent.png';
 
 const Navbar: React.FC = () => {
@@ -39,10 +39,10 @@ const Navbar: React.FC = () => {
   };
 
   const navLinks = [
-    { id: 'about', es: 'Sobre mí', en: 'About me', et: 'Minust' },
-    { id: 'experience', es: 'Experiencia', en: 'Experience', et: 'Kogemus' },
-    { id: 'projects', es: 'Proyectos', en: 'Projects', et: 'Projektid' },
-    { id: 'contact', es: 'Contacto', en: 'Contact', et: 'Kontakt' },
+    { id: 'about', es: 'Sobre mí', en: 'About me', et: 'Minust', num: '01', icon: User },
+    { id: 'experience', es: 'Experiencia', en: 'Experience', et: 'Kogemus', num: '02', icon: Briefcase },
+    { id: 'projects', es: 'Proyectos', en: 'Projects', et: 'Projektid', num: '03', icon: FolderGit2 },
+    { id: 'contact', es: 'Contacto', en: 'Contact', et: 'Kontakt', num: '04', icon: Mail },
   ];
 
   const languages: { code: Language; label: string }[] = [
@@ -220,33 +220,63 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Drawer Ultra-Pro Glassmorphism */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div 
             className="mobile-drawer mobile-only"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -14, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -12, scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 380, damping: 26 }}
           >
+            {/* Header con estado de disponibilidad */}
+            <div className="mobile-drawer-header">
+              <div className="mobile-drawer-status">
+                <span className="status-dot-pulse" />
+                <span className="status-text">
+                  {language === 'es' ? 'Disponible para proyectos' : language === 'et' ? 'Saadaval projektideks' : 'Available for work'}
+                </span>
+              </div>
+              <span className="mobile-drawer-tag">JO • 2026</span>
+            </div>
+
             <div className="mobile-drawer-content">
-              {navLinks.map((link) => (
-                <a
-                  key={link.id}
-                  href={`#${link.id}`}
-                  className="mobile-link"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {link[language] || link.es}
-                </a>
-              ))}
-              <a
+              {navLinks.map((link, idx) => {
+                const IconComponent = link.icon;
+                return (
+                  <motion.a
+                    key={link.id}
+                    href={`#${link.id}`}
+                    className="mobile-link-card"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.04 * idx, duration: 0.22 }}
+                  >
+                    <div className="mobile-link-left">
+                      <div className="mobile-link-icon-box">
+                        <IconComponent size={15} />
+                      </div>
+                      <span className="mobile-link-num">{link.num}</span>
+                      <span className="mobile-link-title">{link[language] || link.es}</span>
+                    </div>
+                    <ChevronRight size={16} className="mobile-link-chevron" />
+                  </motion.a>
+                );
+              })}
+
+              <motion.a
                 href="#contact"
-                className="btn-pill-navy mobile-cta"
+                className="mobile-cta-premium"
                 onClick={() => setIsMobileMenuOpen(false)}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.25 }}
               >
-                {language === 'en' ? "Let's talk" : language === 'et' ? 'Räägime' : 'Hablemos'}
-              </a>
+                <span>{language === 'en' ? "Let's talk" : language === 'et' ? 'Räägime' : 'Hablemos'}</span>
+                <Send size={15} className="mobile-cta-icon" />
+              </motion.a>
             </div>
           </motion.div>
         )}
@@ -648,53 +678,223 @@ const Navbar: React.FC = () => {
           background: var(--bg-card);
         }
 
-        /* Mobile Drawer */
+        /* Mobile Drawer Ultra-Pro Glassmorphism */
         .mobile-drawer {
           position: absolute;
-          top: 100%;
-          left: 0.75rem;
-          right: 0.75rem;
-          background: rgba(14, 22, 32, 0.96);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.12);
+          top: calc(100% + 0.65rem);
+          left: 0.85rem;
+          right: 0.85rem;
+          background: rgba(255, 255, 255, 0.94);
+          backdrop-filter: blur(28px) saturate(180%);
+          -webkit-backdrop-filter: blur(28px) saturate(180%);
+          border: 1px solid rgba(0, 114, 206, 0.16);
           border-radius: 1.5rem;
-          padding: 1.5rem;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-          margin-top: 0.5rem;
+          padding: 1.15rem 1.15rem 1.35rem 1.15rem;
+          box-shadow: 
+            0 24px 50px -10px rgba(15, 23, 42, 0.14),
+            0 0 1px 1px rgba(255, 255, 255, 0.85) inset,
+            0 8px 24px -4px rgba(0, 114, 206, 0.12);
           z-index: 1001;
+        }
+
+        body.dark-mode .mobile-drawer {
+          background: rgba(12, 17, 26, 0.94);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          box-shadow: 
+            0 28px 60px -12px rgba(0, 0, 0, 0.85),
+            0 0 0 1px rgba(0, 114, 206, 0.25),
+            0 8px 25px -4px rgba(0, 114, 206, 0.2);
+        }
+
+        /* Mobile Drawer Header */
+        .mobile-drawer-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding-bottom: 0.85rem;
+          margin-bottom: 0.85rem;
+          border-bottom: 1px solid rgba(0, 114, 206, 0.1);
+        }
+
+        body.dark-mode .mobile-drawer-header {
+          border-bottom-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .mobile-drawer-status {
+          display: flex;
+          align-items: center;
+          gap: 0.45rem;
+        }
+
+        .status-dot-pulse {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: #10b981;
+          box-shadow: 0 0 8px #10b981;
+          animation: pulseGreen 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseGreen {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .status-text {
+          font-size: 0.72rem;
+          font-weight: 600;
+          color: var(--text-muted);
+          letter-spacing: -0.01em;
+        }
+
+        .mobile-drawer-tag {
+          font-family: var(--font-mono);
+          font-size: 0.68rem;
+          font-weight: 700;
+          color: #0072ce;
+          background: rgba(0, 114, 206, 0.08);
+          padding: 0.2rem 0.5rem;
+          border-radius: 9999px;
+          border: 1px solid rgba(0, 114, 206, 0.15);
+        }
+
+        body.dark-mode .mobile-drawer-tag {
+          background: rgba(0, 114, 206, 0.16);
+          color: #38bdf8;
+          border-color: rgba(0, 114, 206, 0.3);
         }
 
         .mobile-drawer-content {
           display: flex;
           flex-direction: column;
-          gap: 1rem;
+          gap: 0.55rem;
         }
 
-        .mobile-link {
-          font-family: var(--font-heading);
-          font-size: 1.05rem;
-          font-weight: 700;
-          color: #ffffff;
-          padding-bottom: 0.75rem;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-          transition: color 0.2s ease;
+        /* Mobile Link Cards */
+        .mobile-link-card {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.72rem 0.9rem;
+          border-radius: 1rem;
+          text-decoration: none;
+          background: rgba(241, 245, 249, 0.65);
+          border: 1px solid rgba(226, 232, 240, 0.8);
+          color: var(--text-h);
+          transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .mobile-link:hover {
+        body.dark-mode .mobile-link-card {
+          background: rgba(255, 255, 255, 0.035);
+          border-color: rgba(255, 255, 255, 0.06);
+          color: #f1f5f9;
+        }
+
+        .mobile-link-card:hover, .mobile-link-card:active {
+          background: rgba(0, 114, 206, 0.08);
+          border-color: rgba(0, 114, 206, 0.25);
+          transform: translateX(3px);
+          color: #0072ce;
+        }
+
+        body.dark-mode .mobile-link-card:hover, body.dark-mode .mobile-link-card:active {
+          background: rgba(0, 114, 206, 0.16);
+          border-color: rgba(0, 114, 206, 0.35);
           color: #38bdf8;
         }
 
-        .mobile-cta {
-          width: 100%;
-          text-align: center;
-          margin-top: 0.5rem;
+        .mobile-link-left {
+          display: flex;
+          align-items: center;
+          gap: 0.65rem;
+        }
+
+        .mobile-link-icon-box {
+          width: 30px;
+          height: 30px;
+          border-radius: 0.55rem;
+          background: rgba(0, 114, 206, 0.08);
+          color: #0072ce;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        body.dark-mode .mobile-link-icon-box {
+          background: rgba(0, 114, 206, 0.18);
+          color: #38bdf8;
+        }
+
+        .mobile-link-card:hover .mobile-link-icon-box {
+          transform: scale(1.08);
           background: #0072ce;
           color: #ffffff;
-          padding: 0.75rem;
-          border-radius: 2rem;
+        }
+
+        .mobile-link-num {
+          font-family: var(--font-mono);
+          font-size: 0.72rem;
           font-weight: 700;
-          display: block;
+          color: var(--text-muted);
+          opacity: 0.8;
+        }
+
+        .mobile-link-title {
+          font-family: var(--font-heading);
+          font-size: 0.96rem;
+          font-weight: 700;
+          letter-spacing: -0.01em;
+        }
+
+        .mobile-link-chevron {
+          color: var(--text-muted);
+          opacity: 0.5;
+          transition: transform 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+        }
+
+        .mobile-link-card:hover .mobile-link-chevron {
+          transform: translateX(2px);
+          color: #0072ce;
+          opacity: 1;
+        }
+
+        body.dark-mode .mobile-link-card:hover .mobile-link-chevron {
+          color: #38bdf8;
+        }
+
+        /* Mobile CTA Premium */
+        .mobile-cta-premium {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.55rem;
+          margin-top: 0.6rem;
+          padding: 0.82rem 1.25rem;
+          border-radius: 9999px;
+          background: linear-gradient(135deg, #0072ce 0%, #00569e 100%);
+          color: #ffffff;
+          font-family: var(--font-heading);
+          font-size: 0.94rem;
+          font-weight: 700;
+          letter-spacing: -0.01em;
+          text-decoration: none;
+          box-shadow: 0 8px 20px -4px rgba(0, 114, 206, 0.45);
+          transition: all 0.25s ease;
+        }
+
+        .mobile-cta-premium:hover, .mobile-cta-premium:active {
+          transform: translateY(-1.5px);
+          box-shadow: 0 12px 26px -4px rgba(0, 114, 206, 0.55);
+          background: linear-gradient(135deg, #0081e8 0%, #005fa8 100%);
+        }
+
+        .mobile-cta-icon {
+          transition: transform 0.2s ease;
+        }
+
+        .mobile-cta-premium:hover .mobile-cta-icon {
+          transform: translateX(3px) translateY(-1px);
         }
 
         @media (max-width: 768px) {

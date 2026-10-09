@@ -270,19 +270,23 @@ const Projects: React.FC = () => {
           margin: 0;
         }
 
-        /* 3-Cols Grid con perspectiva para 3D */
+        /* Grid de Proyectos 3D: Proporciones balanceadas y elegantes en PC y Móvil */
         .projects-cards-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(320px, 460px));
+          justify-content: center;
           gap: 4.5rem 3rem;
-          perspective: 1600px;
+          perspective: 1800px;
           perspective-origin: center center;
-          padding: 1.5rem 1rem 3.5rem 1rem;
+          padding: 1.5rem 1rem 4rem 1rem;
+          max-width: 1200px;
+          margin: 0 auto;
         }
 
         @media (max-width: 1024px) {
           .projects-cards-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: minmax(300px, 480px);
+            justify-content: center;
             gap: 4rem;
             padding: 1rem 0;
           }
@@ -292,17 +296,26 @@ const Projects: React.FC = () => {
           }
         }
 
-        /* 3D Stage / Escenario del piso */
+        @media (max-width: 640px) {
+          .projects-cards-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        /* 3D Stage / Escenario del piso con límites armónicos de tamaño */
         .project-card-3d-stage {
           position: relative;
           display: flex;
           flex-direction: column;
           align-items: center;
-          perspective: 1600px;
-          padding-bottom: 2.5rem;
+          perspective: 1800px;
+          width: 100%;
+          max-width: 460px;
+          margin: 0 auto;
+          padding-bottom: 2.75rem;
         }
 
-        /* Tarjeta 3D Flotante con rotación de lado auténtica y volumen físico */
+        /* Tarjeta 3D Flotante con rotación cinemática fluida y volumen físico */
         .project-card-3d {
           position: relative;
           z-index: 2;
@@ -314,11 +327,11 @@ const Projects: React.FC = () => {
           background: var(--bg-card);
           border: 1px solid var(--border);
           box-shadow: 
-            -14px 22px 42px -10px rgba(0, 0, 0, 0.12),
-            0 0 1px 1px rgba(255, 255, 255, 0.7) inset;
+            -16px 24px 48px -10px rgba(0, 0, 0, 0.12),
+            0 0 1px 1px rgba(255, 255, 255, 0.75) inset;
           transform-style: preserve-3d;
-          transform: perspective(1600px) rotateY(-9deg) rotateX(6deg) rotateZ(-1.2deg) translateY(0px);
-          animation: floatLevitate3D 5.5s ease-in-out infinite alternate;
+          transform: perspective(1600px) rotateY(-8deg) rotateX(5deg) rotateZ(-1.5deg) translateY(0px);
+          animation: floatLevitate3D 6.5s ease-in-out infinite;
           transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
           transform-origin: center bottom;
         }
@@ -326,88 +339,106 @@ const Projects: React.FC = () => {
         /* Modo oscuro para tarjeta 3D */
         body.dark-mode .project-card-3d {
           box-shadow: 
-            -18px 26px 50px -12px rgba(0, 0, 0, 0.6),
-            0 0 1px 1px rgba(255, 255, 255, 0.08) inset;
+            -20px 28px 55px -12px rgba(0, 0, 0, 0.65),
+            0 0 1px 1px rgba(255, 255, 255, 0.09) inset;
         }
 
-        /* Hover interactivo 3D: La tarjeta se eleva hacia adelante y se alinea hacia el espectador */
+        /* Hover interactivo 3D: La tarjeta se orienta de frente al usuario y se eleva */
         .project-card-3d-stage:hover .project-card-3d {
           animation-play-state: paused;
-          transform: perspective(1600px) rotateY(-2deg) rotateX(2deg) rotateZ(0deg) translateY(-22px) scale(1.03);
+          transform: perspective(1600px) rotateY(0deg) rotateX(1.5deg) rotateZ(0deg) translateY(-20px) scale(1.025);
           box-shadow: 
-            0 35px 70px -15px rgba(0, 0, 0, 0.2),
-            0 0 0 1px rgba(0, 114, 206, 0.4),
-            0 14px 35px -6px rgba(0, 114, 206, 0.22);
-          border-color: rgba(0, 114, 206, 0.45);
+            0 32px 65px -14px rgba(0, 0, 0, 0.22),
+            0 0 0 1px rgba(0, 114, 206, 0.42),
+            0 16px 36px -6px rgba(0, 114, 206, 0.24);
+          border-color: rgba(0, 114, 206, 0.48);
         }
 
-        /* Sombra de Sobre Piso (Ground Floor Contact Shadow sincronizada con la inclinación) */
+        /* Sombra de Sobre Piso (Contact Shadow reactiva con la oscilación 3D) */
         .project-floor-shadow {
           position: absolute;
-          bottom: 0.75rem;
+          bottom: 0.85rem;
           left: 50%;
-          transform: translateX(-50%) rotateZ(-1.2deg) scale(1);
-          width: 86%;
+          transform: translateX(-52%) rotateZ(-1.5deg) scale(1);
+          width: 84%;
           height: 22px;
           border-radius: 50%;
-          background: radial-gradient(ellipse at center, rgba(15, 23, 42, 0.42) 0%, rgba(15, 23, 42, 0.16) 45%, transparent 75%);
+          background: radial-gradient(ellipse at center, rgba(15, 23, 42, 0.44) 0%, rgba(15, 23, 42, 0.16) 45%, transparent 75%);
           filter: blur(8px);
           pointer-events: none;
           z-index: 1;
-          animation: shadowPulse3D 5.5s ease-in-out infinite alternate;
+          animation: shadowPulse3D 6.5s ease-in-out infinite;
           transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         /* Modo Oscuro: Sombra de piso con sutil aura azul estonio */
         body.dark-mode .project-floor-shadow {
-          background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.88) 0%, rgba(0, 114, 206, 0.28) 45%, transparent 75%);
+          background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.9) 0%, rgba(0, 114, 206, 0.3) 45%, transparent 75%);
           filter: blur(10px);
         }
 
-        /* Al hacer hover la tarjeta flota más alto, la sombra se suaviza y encoge por física de luz */
+        /* Al hacer hover la tarjeta sube de frente, la sombra se centra y expande suavemente */
         .project-card-3d-stage:hover .project-floor-shadow {
           animation-play-state: paused;
-          transform: translateX(-50%) scale(0.74);
-          opacity: 0.45;
-          filter: blur(12px);
+          transform: translateX(-50%) rotateZ(0deg) scale(0.78);
+          opacity: 0.42;
+          filter: blur(13px);
         }
 
-        /* Animaciones continuas de levitación 3D física */
+        /* Secuencia de levitación 3D continua con giroscopía y cadencia natural */
         @keyframes floatLevitate3D {
           0% {
-            transform: perspective(1600px) rotateY(-9deg) rotateX(6deg) rotateZ(-1.2deg) translateY(0px);
+            transform: perspective(1600px) rotateY(-8deg) rotateX(5deg) rotateZ(-1.5deg) translateY(0px);
           }
-          50% {
-            transform: perspective(1600px) rotateY(-6deg) rotateX(3.5deg) rotateZ(-0.6deg) translateY(-14px);
+          28% {
+            transform: perspective(1600px) rotateY(-4deg) rotateX(7deg) rotateZ(-0.5deg) translateY(-10px);
+          }
+          52% {
+            transform: perspective(1600px) rotateY(4deg) rotateX(4deg) rotateZ(1deg) translateY(-18px);
+          }
+          76% {
+            transform: perspective(1600px) rotateY(-1deg) rotateX(3deg) rotateZ(-0.6deg) translateY(-8px);
           }
           100% {
-            transform: perspective(1600px) rotateY(-9deg) rotateX(6deg) rotateZ(-1.2deg) translateY(0px);
+            transform: perspective(1600px) rotateY(-8deg) rotateX(5deg) rotateZ(-1.5deg) translateY(0px);
           }
         }
 
         @keyframes shadowPulse3D {
           0% {
-            transform: translateX(-50%) rotateZ(-1.2deg) scale(1);
-            opacity: 0.9;
+            transform: translateX(-52%) rotateZ(-1.5deg) scale(1);
+            opacity: 0.88;
             filter: blur(8px);
           }
-          50% {
-            transform: translateX(-50%) rotateZ(-1.2deg) scale(0.82);
-            opacity: 0.55;
-            filter: blur(12px);
+          28% {
+            transform: translateX(-50%) rotateZ(-0.5deg) scale(0.9);
+            opacity: 0.72;
+            filter: blur(10px);
+          }
+          52% {
+            transform: translateX(-47%) rotateZ(1deg) scale(0.78);
+            opacity: 0.5;
+            filter: blur(14px);
+          }
+          76% {
+            transform: translateX(-49%) rotateZ(-0.6deg) scale(0.91);
+            opacity: 0.72;
+            filter: blur(10px);
           }
           100% {
-            transform: translateX(-50%) rotateZ(-1.2deg) scale(1);
-            opacity: 0.9;
+            transform: translateX(-52%) rotateZ(-1.5deg) scale(1);
+            opacity: 0.88;
             filter: blur(8px);
           }
         }
 
-        /* Image Box */
+        /* Image Box con proporción 16:9 cinematográfica */
         .project-image-box {
           position: relative;
           width: 100%;
-          height: 220px;
+          aspect-ratio: 16 / 9;
+          min-height: 220px;
+          max-height: 270px;
           overflow: hidden;
           background: #0f172a;
         }
