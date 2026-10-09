@@ -118,78 +118,96 @@ const Projects: React.FC = () => {
         ) : (
           <div className="projects-cards-grid">
             {projectsToRender.map((project, idx) => (
-            <motion.div
-              key={project.id}
-              className="project-card"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: idx * 0.1 }}
-              whileHover={{ y: -6 }}
-            >
-              {/* Card Image Cover Limpia */}
-              <div className="project-image-box">
-                <img 
-                  src={project.image_url} 
-                  alt={project.title} 
-                  className="project-cover-img"
-                  loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-                <div className="project-cover-placeholder">
-                  <Code2 size={36} className="placeholder-svg" />
-                  <span>{project.title}</span>
-                </div>
-              </div>
+              <div key={project.id} className="project-card-3d-stage">
+                <motion.div
+                  className="project-card project-card-3d"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: idx * 0.12 }}
+                >
+                  {/* Card Image Cover con soporte dinámico */}
+                  <div className="project-image-box">
+                    {project.image_url ? (
+                      <img 
+                        src={project.image_url} 
+                        alt={project.title} 
+                        className="project-cover-img"
+                        loading="lazy"
+                        onError={(e) => {
+                          const img = e.currentTarget;
+                          img.style.display = 'none';
+                          const parent = img.parentElement;
+                          const placeholder = parent?.querySelector('.project-cover-placeholder') as HTMLElement;
+                          if (placeholder) placeholder.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
 
-              {/* Card Info Body */}
-              <div className="project-body">
-                <span className="project-category-num">{project.category_num}</span>
-                <h3 className="project-name">{project.title}</h3>
-                <p className="project-summary">
-                  {language === 'en' ? project.desc_en : language === 'et' ? project.desc_et : project.desc_es}
-                </p>
-
-                {/* Tech Pills */}
-                <div className="project-tech-pills">
-                  {project.stack.map((tech: string, tIdx: number) => (
-                    <span key={tIdx} className="pill-badge">{tech}</span>
-                  ))}
-                </div>
-
-                {/* Action Buttons */}
-                <div className="project-footer-actions">
-                  {project.live_url && project.live_url !== '#' && (
-                    <a 
-                      href={project.live_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="project-primary-btn"
+                    {/* Placeholder de respaldo (solo visible si no hay imagen o si falla) */}
+                    <div 
+                      className="project-cover-placeholder"
+                      style={{ display: project.image_url ? 'none' : 'flex' }}
                     >
-                      <span>{getT('demo_btn', getFallback('demo_btn'))}</span>
-                      <ExternalLink size={14} />
-                    </a>
-                  )}
+                      <Code2 size={40} className="placeholder-svg" />
+                      <span>{project.title}</span>
+                    </div>
 
-                  {project.github_url && (
-                    <a 
-                      href={project.github_url} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="project-secondary-btn"
-                      title="Ver Código en GitHub"
-                    >
-                      <Github size={15} />
-                      <span>{getT('code_btn', getFallback('code_btn'))}</span>
-                    </a>
-                  )}
-                </div>
+                    {/* Badge 3D flotante sobre la imagen */}
+                    <div className="project-floating-category-badge">
+                      <span>{project.category_num}</span>
+                    </div>
+                  </div>
+
+                  {/* Card Info Body */}
+                  <div className="project-body">
+                    <h3 className="project-name">{project.title}</h3>
+                    <p className="project-summary">
+                      {language === 'en' ? project.desc_en : language === 'et' ? project.desc_et : project.desc_es}
+                    </p>
+
+                    {/* Tech Pills */}
+                    <div className="project-tech-pills">
+                      {project.stack.map((tech: string, tIdx: number) => (
+                        <span key={tIdx} className="pill-badge">{tech}</span>
+                      ))}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="project-footer-actions">
+                      {project.live_url && project.live_url !== '#' && (
+                        <a 
+                          href={project.live_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="project-primary-btn"
+                        >
+                          <span>{getT('demo_btn', getFallback('demo_btn'))}</span>
+                          <ExternalLink size={14} />
+                        </a>
+                      )}
+
+                      {project.github_url && (
+                        <a 
+                          href={project.github_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="project-secondary-btn"
+                          title="Ver Código en GitHub"
+                        >
+                          <Github size={15} />
+                          <span>{getT('code_btn', getFallback('code_btn'))}</span>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Sombra de Sobre Piso 3D Realista */}
+                <div className="project-floor-shadow" aria-hidden="true" />
               </div>
-            </motion.div>
-          ))}
-        </div>
+            ))}
+          </div>
         )}
       </div>
 
@@ -226,17 +244,18 @@ const Projects: React.FC = () => {
           margin: 0;
         }
 
-        /* 3-Cols Grid */
+        /* 3-Cols Grid con perspectiva para 3D */
         .projects-cards-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 1.75rem;
+          gap: 3rem 2rem;
+          perspective: 1400px;
         }
 
         @media (max-width: 1024px) {
           .projects-cards-grid {
             grid-template-columns: 1fr;
-            gap: 2.25rem;
+            gap: 3.5rem;
           }
           .projects-header-grid {
             grid-template-columns: 1fr;
@@ -244,62 +263,142 @@ const Projects: React.FC = () => {
           }
         }
 
-        /* Project Card Limpia */
-        .project-card {
+        /* 3D Stage / Escenario del piso */
+        .project-card-3d-stage {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding-bottom: 1.75rem;
+        }
+
+        /* Tarjeta 3D Flotante */
+        .project-card-3d {
+          position: relative;
+          z-index: 2;
+          width: 100%;
           display: flex;
           flex-direction: column;
           border-radius: 1.5rem;
           overflow: hidden;
           background: var(--bg-card);
           border: 1px solid var(--border);
-          box-shadow: var(--shadow-card);
-          transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s ease, border-color 0.25s ease;
+          box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.08), 0 0 1px 1px rgba(255, 255, 255, 0.6) inset;
+          transform-style: preserve-3d;
+          transform: translateY(0px) rotateX(1deg);
+          animation: floatLevitate 5s ease-in-out infinite alternate;
+          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
         }
 
-        .project-card:hover {
-          transform: translateY(-2.5px);
-          box-shadow: var(--shadow-lg);
-          border-color: rgba(0, 114, 206, 0.25);
+        /* Efecto Hover 3D con mayor elevación e inclinación */
+        .project-card-3d-stage:hover .project-card-3d {
+          animation-play-state: paused;
+          transform: translateY(-16px) rotateX(4deg) scale(1.025);
+          box-shadow: 
+            0 25px 50px -12px rgba(0, 0, 0, 0.16),
+            0 0 0 1px rgba(0, 114, 206, 0.35),
+            0 12px 28px -6px rgba(0, 114, 206, 0.18);
+          border-color: rgba(0, 114, 206, 0.4);
+        }
+
+        /* Sombra de Sobre Piso (Floor Contact Shadow) */
+        .project-floor-shadow {
+          position: absolute;
+          bottom: 0.5rem;
+          left: 50%;
+          transform: translateX(-50%) scale(1);
+          width: 82%;
+          height: 18px;
+          border-radius: 50%;
+          background: radial-gradient(ellipse at center, rgba(15, 23, 42, 0.35) 0%, rgba(15, 23, 42, 0.12) 50%, transparent 75%);
+          filter: blur(6px);
+          pointer-events: none;
+          z-index: 1;
+          animation: shadowPulse 5s ease-in-out infinite alternate;
+          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Modo Oscuro: Sombra de piso con sutil aura azul */
+        body.dark-mode .project-floor-shadow {
+          background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.8) 0%, rgba(0, 114, 206, 0.25) 45%, transparent 75%);
+          filter: blur(8px);
+        }
+
+        /* Al hacer hover la tarjeta sube, la sombra se suaviza y encoge por física de luz */
+        .project-card-3d-stage:hover .project-floor-shadow {
+          animation-play-state: paused;
+          transform: translateX(-50%) scale(0.78);
+          opacity: 0.5;
+          filter: blur(9px);
+        }
+
+        /* Animaciones continuas de levitación física */
+        @keyframes floatLevitate {
+          0% {
+            transform: translateY(0px) rotateX(1deg);
+          }
+          50% {
+            transform: translateY(-9px) rotateX(2.5deg);
+          }
+          100% {
+            transform: translateY(0px) rotateX(1deg);
+          }
+        }
+
+        @keyframes shadowPulse {
+          0% {
+            transform: translateX(-50%) scale(1);
+            opacity: 0.85;
+            filter: blur(6px);
+          }
+          50% {
+            transform: translateX(-50%) scale(0.85);
+            opacity: 0.55;
+            filter: blur(8px);
+          }
+          100% {
+            transform: translateX(-50%) scale(1);
+            opacity: 0.85;
+            filter: blur(6px);
+          }
         }
 
         /* Image Box */
         .project-image-box {
           position: relative;
           width: 100%;
-          height: 210px;
+          height: 220px;
           overflow: hidden;
-          background: #e2e8f0;
-        }
-
-        body.dark-mode .project-image-box {
           background: #0f172a;
         }
 
         .project-cover-img {
+          position: relative;
+          z-index: 1;
           width: 100%;
           height: 100%;
           object-fit: cover;
           display: block;
-          transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .project-card:hover .project-cover-img {
-          transform: scale(1.025);
+        .project-card-3d-stage:hover .project-cover-img {
+          transform: scale(1.05);
         }
 
         .project-cover-placeholder {
           position: absolute;
           inset: 0;
+          z-index: 1;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 0.5rem;
+          gap: 0.6rem;
           background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
           color: var(--text-muted);
           font-family: var(--font-mono);
           font-size: 0.85rem;
-          z-index: 0;
         }
 
         body.dark-mode .project-cover-placeholder {
@@ -311,22 +410,32 @@ const Projects: React.FC = () => {
           color: #0072ce;
         }
 
+        .project-floating-category-badge {
+          position: absolute;
+          top: 0.85rem;
+          right: 0.85rem;
+          z-index: 2;
+          background: rgba(15, 23, 42, 0.78);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          color: #ffffff;
+          padding: 0.3rem 0.7rem;
+          border-radius: 9999px;
+          font-family: var(--font-mono);
+          font-size: 0.66rem;
+          font-weight: 700;
+          letter-spacing: 0.05em;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+          pointer-events: none;
+        }
+
         /* Card Body */
         .project-body {
           padding: 1.6rem;
           display: flex;
           flex-direction: column;
           flex-grow: 1;
-        }
-
-        .project-category-num {
-          font-family: var(--font-mono);
-          font-size: 0.68rem;
-          font-weight: 700;
-          color: var(--kicker);
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          margin-bottom: 0.5rem;
         }
 
         .project-name {
