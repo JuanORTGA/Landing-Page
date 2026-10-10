@@ -230,17 +230,6 @@ const Navbar: React.FC = () => {
             exit={{ opacity: 0, y: -12, scale: 0.97 }}
             transition={{ type: "spring", stiffness: 380, damping: 26 }}
           >
-            {/* Header con estado de disponibilidad */}
-            <div className="mobile-drawer-header">
-              <div className="mobile-drawer-status">
-                <span className="status-dot-pulse" />
-                <span className="status-text">
-                  {language === 'es' ? 'Disponible para proyectos' : language === 'et' ? 'Saadaval projektideks' : 'Available for work'}
-                </span>
-              </div>
-              <span className="mobile-drawer-tag">JO • 2026</span>
-            </div>
-
             <div className="mobile-drawer-content">
               {navLinks.map((link, idx) => {
                 const IconComponent = link.icon;
@@ -704,64 +693,6 @@ const Navbar: React.FC = () => {
             0 28px 60px -12px rgba(0, 0, 0, 0.85),
             0 0 0 1px rgba(0, 114, 206, 0.25),
             0 8px 25px -4px rgba(0, 114, 206, 0.2);
-        }
-
-        /* Mobile Drawer Header */
-        .mobile-drawer-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding-bottom: 0.85rem;
-          margin-bottom: 0.85rem;
-          border-bottom: 1px solid rgba(0, 114, 206, 0.1);
-        }
-
-        body.dark-mode .mobile-drawer-header {
-          border-bottom-color: rgba(255, 255, 255, 0.08);
-        }
-
-        .mobile-drawer-status {
-          display: flex;
-          align-items: center;
-          gap: 0.45rem;
-        }
-
-        .status-dot-pulse {
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background: #10b981;
-          box-shadow: 0 0 8px #10b981;
-          animation: pulseGreen 2s ease-in-out infinite;
-        }
-
-        @keyframes pulseGreen {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.4; transform: scale(0.85); }
-        }
-
-        .status-text {
-          font-size: 0.72rem;
-          font-weight: 600;
-          color: var(--text-muted);
-          letter-spacing: -0.01em;
-        }
-
-        .mobile-drawer-tag {
-          font-family: var(--font-mono);
-          font-size: 0.68rem;
-          font-weight: 700;
-          color: #0072ce;
-          background: rgba(0, 114, 206, 0.08);
-          padding: 0.2rem 0.5rem;
-          border-radius: 9999px;
-          border: 1px solid rgba(0, 114, 206, 0.15);
-        }
-
-        body.dark-mode .mobile-drawer-tag {
-          background: rgba(0, 114, 206, 0.16);
-          color: #38bdf8;
-          border-color: rgba(0, 114, 206, 0.3);
         }
 
         .mobile-drawer-content {
