@@ -5,6 +5,13 @@ import { motion } from 'framer-motion';
 import { ExternalLink, Gem } from 'lucide-react';
 import { AcademicDegreeIcon } from './icons/FlaticonVectors';
 import type { EducationItem } from '../types/database';
+import { 
+  resolveEducationDegree, 
+  resolveEducationFieldOfStudy, 
+  resolveEducationInstitution, 
+  translateDateStr,
+  type SupportedLang 
+} from '../services/multilingualData';
 
 const parseStack = (rawStack: any): string[] => {
   if (Array.isArray(rawStack)) return rawStack;
@@ -123,12 +130,16 @@ const Education: React.FC = () => {
           ) : (
             <div className="linkedin-experience-list">
               {dbEducation.map((edu, idx) => {
-              const degree = (language === 'en' ? edu.degree_en : language === 'et' ? edu.degree_et : edu.degree_es) || edu.degree_es;
-              const desc = (language === 'en' ? edu.description_en : language === 'et' ? edu.description_et : edu.description_es) || edu.description_es || '';
+              const currentLang = (language as SupportedLang) || 'es';
+              const degree = resolveEducationDegree(edu, currentLang);
+              const institution = resolveEducationInstitution(edu, currentLang);
+              const fieldOfStudy = resolveEducationFieldOfStudy(edu, currentLang);
+              const desc = (currentLang === 'en' ? edu.description_en : currentLang === 'et' ? edu.description_et : edu.description_es) || edu.description_es || '';
               const isCurrent = edu.is_current || !edu.end_date || edu.end_date.toLowerCase() === 'present' || edu.end_date.toLowerCase() === 'presente';
 
-              const endDateStr = isCurrent ? getFallback('present_word') : edu.end_date;
-              const dateLine = `${edu.start_date} - ${endDateStr}`;
+              const startDateStr = translateDateStr(edu.start_date, currentLang);
+              const endDateStr = isCurrent ? getFallback('present_word') : translateDateStr(edu.end_date, currentLang);
+              const dateLine = `${startDateStr} - ${endDateStr}`;
 
               const techStack = parseStack(edu.stack);
               const isSkillsOpen = Boolean(expandedSkills[edu.id || String(idx)]);
@@ -151,7 +162,7 @@ const Education: React.FC = () => {
                     {edu.institution_logo ? (
                       <img
                         src={edu.institution_logo}
-                        alt={edu.institution}
+                        alt={institution}
                         className="linkedin-logo-img"
                         onError={(e) => {
                           (e.target as HTMLElement).style.display = 'none';
@@ -170,11 +181,11 @@ const Education: React.FC = () => {
 
                     {/* Línea 2: Nombre de la Institución · Disciplina */}
                     <div className="linkedin-company-line">
-                      <span className="company-name">{edu.institution}</span>
-                      {edu.field_of_study && (
+                      <span className="company-name">{institution}</span>
+                      {fieldOfStudy && (
                         <>
                           <span className="dot-divider">·</span>
-                          <span className="employment-type">{edu.field_of_study}</span>
+                          <span className="employment-type">{fieldOfStudy}</span>
                         </>
                       )}
                     </div>

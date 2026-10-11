@@ -4,13 +4,14 @@ import { supabase } from '../services/supabase';
 import { motion } from 'framer-motion';
 import type { Skill } from '../types/database';
 import { getTechLogoUrl, techPresetsList, translateSkillCategory, translateSkillTier } from '../services/techLogos';
+import { techDescriptionsMultilingual, type SupportedLang } from '../services/multilingualData';
 
 const Skills: React.FC = () => {
   const { language, t } = useLanguage();
   const [dbSkills, setDbSkills] = useState<Skill[]>([]);
   const [hasLoaded, setHasLoaded] = useState(false);
 
-  const currentLang = (language as 'es' | 'en' | 'et') || 'es';
+  const currentLang = (language as SupportedLang) || 'es';
 
   useEffect(() => {
     const fetchSkills = async () => {
@@ -58,50 +59,6 @@ const Skills: React.FC = () => {
     return fallbacks[key]?.[language as string] || fallbacks[key]?.['es'] || key;
   };
 
-  // Fallbacks inteligentes de descripción y tags para cada tecnología
-  const techDescriptions: Record<string, { focus: string; tags: string[] }> = {
-    python: {
-      focus: 'Estructuras de datos, algoritmos, scripts de automatización y desarrollo backend robusto.',
-      tags: ['Python 3', 'OOP', 'Data Structures']
-    },
-    django: {
-      focus: 'Modelos ORM relacionales, autenticación JWT, APIs REST y arquitectura escalable.',
-      tags: ['Django', 'REST APIs', 'ORM']
-    },
-    react: {
-      focus: 'Componentes modernos, Single Page Applications, state management y renderizado fluido.',
-      tags: ['React 18', 'Hooks', 'Vite']
-    },
-    typescript: {
-      focus: 'Tipado estático seguro, interfaces robustas y prevención de bugs en compilación.',
-      tags: ['TypeScript', 'Strict Types', 'ES6+']
-    },
-    postgresql: {
-      focus: 'Diseño relacional, consultas SQL complejas, índices y transacciones seguras ACID.',
-      tags: ['PostgreSQL', 'SQL', 'Supabase']
-    },
-    node: {
-      focus: 'Servidores asíncronos en tiempo real, APIs REST y microservicios de alto rendimiento.',
-      tags: ['Node.js', 'Express', 'APIs']
-    },
-    docker: {
-      focus: 'Contenedores estandarizados, Dockerfile multi-stage y ambientes de despliegue aislados.',
-      tags: ['Docker', 'Containers', 'Cloud']
-    },
-    yolo: {
-      focus: 'Modelos de visión artificial para detección y seguimiento de objetos en tiempo real.',
-      tags: ['YOLOv8', 'Computer Vision', 'PyTorch']
-    },
-    roboflow: {
-      focus: 'Anotación y preparación de datasets para entrenamiento de modelos de visión.',
-      tags: ['Datasets', 'Inference', 'Vision AI']
-    },
-    vscode: {
-      focus: 'Depuración avanzada, linters, extensiones de productividad y workflows ágiles.',
-      tags: ['VS Code', 'Productivity', 'Tooling']
-    },
-  };
-
   // Merge database skills with curated styling & official vector icons (100% gobernado por Supabase y traducido dinámicamente)
   const displaySkills = dbSkills.map((s, idx) => {
     const presetMatch = techPresetsList.find(d => 
@@ -121,11 +78,24 @@ const Skills: React.FC = () => {
       : null;
 
     const sKey = (s.icon || s.name || '').toLowerCase();
-    const matchedKey = Object.keys(techDescriptions).find(k => sKey.includes(k));
-    const fallbackData = matchedKey ? techDescriptions[matchedKey] : null;
+    const matchedKey = Object.keys(techDescriptionsMultilingual).find(k => sKey.includes(k));
+    const fallbackData = matchedKey ? techDescriptionsMultilingual[matchedKey] : null;
 
-    const focus = (s as any).description || (s as any).focus || fallbackData?.focus || 'Tecnología fundamental orientada a ingeniería y arquitectura de software.';
-    const tags = (s as any).tags || fallbackData?.tags || [rawTier];
+    const focus = (currentLang === 'en' 
+      ? ((s as any).description_en || fallbackData?.focus.en)
+      : currentLang === 'et'
+      ? ((s as any).description_et || fallbackData?.focus.et)
+      : ((s as any).description_es || (s as any).description || fallbackData?.focus.es))
+      || fallbackData?.focus[currentLang]
+      || fallbackData?.focus.es
+      || (currentLang === 'en' ? 'Core technology focused on modern software engineering and architecture.'
+         : currentLang === 'et' ? 'Põhitehnoloogia kaasaegse tarkvaraehituse ja veebiarhitektuuri jaoks.'
+         : 'Tecnología fundamental orientada a ingeniería y arquitectura de software.');
+
+    const tags = (s as any).tags 
+      || fallbackData?.tags[currentLang] 
+      || fallbackData?.tags.es 
+      || [translateSkillTier(rawTier, currentLang)];
 
     return {
       id: s.id || `skill-${idx}`,

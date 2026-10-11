@@ -5,6 +5,14 @@ import { motion } from 'framer-motion';
 import { Gem } from 'lucide-react';
 import { EnterpriseWorkIcon } from './icons/FlaticonVectors';
 import type { ExperienceItem } from '../types/database';
+import { 
+  resolveExperienceRole, 
+  resolveExperienceDescription, 
+  translateEmploymentType, 
+  translateWorkMode, 
+  translateDateStr,
+  type SupportedLang 
+} from '../services/multilingualData';
 
 const parseStack = (rawStack: any): string[] => {
   if (Array.isArray(rawStack)) return rawStack;
@@ -137,16 +145,18 @@ const Experience: React.FC = () => {
           ) : (
             <div className="linkedin-experience-list">
               {dbExperiences.map((exp, idx) => {
-              const role = (language === 'en' ? exp.role_en : language === 'et' ? exp.role_et : exp.role_es) || exp.role_es;
-              const desc = (language === 'en' ? exp.description_en : language === 'et' ? exp.description_et : exp.description_es) || exp.description_es;
+              const currentLang = (language as SupportedLang) || 'es';
+              const role = resolveExperienceRole(exp, currentLang);
+              const desc = resolveExperienceDescription(exp, currentLang);
               const isCurrent = exp.is_current || !exp.end_date || exp.end_date.toLowerCase() === 'present' || exp.end_date.toLowerCase() === 'presente';
 
-              const endDateStr = isCurrent ? getFallback('present_word') : exp.end_date;
-              const dateLine = `${exp.start_date} - ${endDateStr}`;
+              const startDateStr = translateDateStr(exp.start_date, currentLang);
+              const endDateStr = isCurrent ? getFallback('present_word') : translateDateStr(exp.end_date, currentLang);
+              const dateLine = `${startDateStr} - ${endDateStr}`;
 
-              // Formato de Modalidad y Tipo de Empleo
-              const empType = exp.employment_type || getFallback('full_time_label');
-              const workMode = exp.work_mode || getFallback('onsite_label');
+              // Formato de Modalidad y Tipo de Empleo traducidos con precisión nativa
+              const empType = translateEmploymentType(exp.employment_type, currentLang);
+              const workMode = translateWorkMode(exp.work_mode, currentLang);
 
               // Stack de habilidades
               const techStack = parseStack(exp.stack);
